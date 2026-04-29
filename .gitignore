@@ -1,0 +1,40 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors / IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Office temp files
+~$*
+*.tmp
+
+# Logs
+*.log
+logs/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# MySQL / DB
+*.sql.bak
+*.dump
+*.sqlite
+*.sqlite3
+*.db
+
+# Build / dependency dirs
+node_modules/
+dist/
+build/
+out/
+
+# Claude
+.claude/
