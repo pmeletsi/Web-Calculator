@@ -1,11 +1,42 @@
 import { useEffect, useState } from "react";
 import HistoryButton from "./HistoryButton";
+import Login from "./Login";
+
+// Βοηθητική συνάρτηση validation για το expression
+function isValidExpression(expr) {
+  if (!expr || expr.trim() === "") return false; // κενό ή μόνο κενά
+  if (/[+\-x/%\.]$/.test(expr)) return false; // μην τελειώνει με operator/τελεία
+  if (/([+\-x/%]{2,})/.test(expr.replace(/--/g, ""))) return false; // δύο συνεχόμενα operators (όχι "--")
+  if (/\.\./.test(expr)) return false; // διπλή τελεία
+  if (/[^0-9+\-x/%\.\s]/.test(expr)) return false; // μη επιτρεπτοί χαρακτήρες
+  // αποφυγή διαίρεσης με μηδέν
+  const norm = expr.replace(/x/g, "*");
+  try {
+    if (/\/0(?![0-9\.])/.test(norm)) return false;
+  } catch { return false; }
+  return true;
+}
 
 const App = () => {
+  // Διαχείριση logged in user
+  const [user, setUser] = useState(() => {
+    return localStorage.getItem("user") || null;
+  });
+
+  const handleLogin = (username) => {
+    setUser(username);
+    localStorage.setItem("user", username);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem("user");
+  };
+
   const [input, setInput] = useState("");
   const [showHistory, setShowHistory] = useState(false);
 
-  // Load history from localStorage 
+  // Load history from localStorage
   const [history, setHistory] = useState(() => {
     try {
       const saved = localStorage.getItem("calc_history");
@@ -37,20 +68,27 @@ const App = () => {
     setInput((prev) => prev.slice(0, -1));
   };
 
-  //Handle Calculate 
+  //Handle Calculate (με validation!)
   const handleCalculate = () => {
+    if (!isValidExpression(input)) {
+      setInput("Invalid");
+      return;
+    }
     try {
       const expression = input;
-
-      // Support "x" button for multiplication
       const normalized = expression.replace(/x/g, "*");
-
       const result = eval(normalized).toString();
       setInput(result);
 
-      // History
+      // Ιστορικό με username και timestamp
       setHistory((prev) => [
-        { expression, result, createdAt: new Date().toISOString() }, ...prev,
+        {
+          expression,
+          result,
+          createdAt: new Date().toISOString(),
+          username: user,
+        },
+        ...prev,
       ]);
     } catch {
       setInput("Error");
@@ -60,84 +98,103 @@ const App = () => {
   //Handle Clear history
   const handleClearHistory = () => setHistory([]);
 
+  // Αν δεν έχει γίνει login, εμφανίζεται η φόρμα login
+  if (!user) {
+    return (
+      <div style={{
+        minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center"
+      }}>
+        <Login onLogin={handleLogin} />
+      </div>
+    );
+  }
 
   return (
     <div className="calculator-container">
       <div className="calculator">
-        {/* Οταν showHistory=false, να είναι το calculator */}
+        {/* Πάνω μπάρα με History αριστερά & Logout δεξιά */}
+        <div style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          marginBottom: 8
+        }}>
+          <HistoryButton onClick={() => setShowHistory(true)} />
+          <button className="btn control" onClick={handleLogout}>Logout</button>
+        </div>
+        {/* Calculator ή History */}
         {!showHistory ? (
           <>
-            <div className = "display"> {input || "0"} </div>
-            <div style = {{display: "flex", justifyContent: "flex-end", marginBottom: 8}}>
-              <HistoryButton onClick={() => setShowHistory(true)} />
-            </div>
-
+            <div className="display"> {input || "0"} </div>
             <div className="buttons">
-              <button className="btn control" onClick = {handleClear}>
+              <button className="btn control" onClick={handleClear}>
                 C
               </button>
-              <button className="btn control" onClick = {handleDelete}>
+              <button className="btn control" onClick={handleDelete}>
                 DEL
               </button>
-              <button className="btn operator" onClick = {() => handleClick("%")}>
+              <button className="btn operator" onClick={() => handleClick("%")}>
                 %
               </button>
-              <button className="btn operator" onClick = {() => handleClick("/")}>
+              <button className="btn operator" onClick={() => handleClick("/")}>
                 /
               </button>
 
-              <button className="btn" onClick = {() => handleClick("7")}>
+              <button className="btn" onClick={() => handleClick("7")}>
                 7
               </button>
-              <button className="btn" onClick = {() => handleClick("8")}>
+              <button className="btn" onClick={() => handleClick("8")}>
                 8
               </button>
-              <button className="btn" onClick = {() => handleClick("9")}>
+              <button className="btn" onClick={() => handleClick("9")}>
                 9
               </button>
               <button className="btn operator" onClick={() => handleClick("x")}>
                 x
               </button>
 
-              <button className="btn" onClick = {() => handleClick("4")}>
+              <button className="btn" onClick={() => handleClick("4")}>
                 4
               </button>
-              <button className="btn" onClick = {() => handleClick("5")}>
+              <button className="btn" onClick={() => handleClick("5")}>
                 5
               </button>
-              <button className="btn" onClick = {() => handleClick("6")}>
+              <button className="btn" onClick={() => handleClick("6")}>
                 6
               </button>
-              <button className="btn operator" onClick = {() => handleClick("-")}>
+              <button className="btn operator" onClick={() => handleClick("-")}>
                 -
               </button>
 
-              <button className="btn" onClick = {() => handleClick("1")}>
+              <button className="btn" onClick={() => handleClick("1")}>
                 1
               </button>
-              <button className="btn" onClick = {() => handleClick("2")}>
+              <button className="btn" onClick={() => handleClick("2")}>
                 2
               </button>
-              <button className="btn" onClick = {() => handleClick("3")}>
+              <button className="btn" onClick={() => handleClick("3")}>
                 3
               </button>
-              <button className="btn operator" onClick = {() => handleClick("+")}>
+              <button className="btn operator" onClick={() => handleClick("+")}>
                 +
               </button>
 
-              <button className="btn zero" onClick = {() => handleClick("0")}>
+              <button className="btn zero" onClick={() => handleClick("0")}>
                 0
               </button>
-              <button className="btn" onClick = {() => handleClick(".")}>
+              <button className="btn" onClick={() => handleClick(".")}>
                 .
               </button>
-              <button className="btn equals" onClick = {handleCalculate}>
+              <button
+                className="btn equals"
+                onClick={handleCalculate}
+                disabled={!isValidExpression(input)}
+              >
                 =
               </button>
             </div>
           </>
         ) : (
-        
           <div className="history">
             <div className="history-header">
               <span>History</span>
@@ -145,7 +202,7 @@ const App = () => {
                 <button className="btn control" onClick={handleClearHistory}>
                   Clear
                 </button>
-                <button className="btn control" onClick={() => setShowHistory(false)} style={{marginLeft: 8}}>
+                <button className="btn control" onClick={() => setShowHistory(false)} style={{ marginLeft: 8 }}>
                   Close
                 </button>
               </div>
@@ -164,8 +221,21 @@ const App = () => {
                     }}
                     title="Click to reuse"
                   >
-                    <span className="history-exp">{h.expression}</span>
-                    <span className="history-res">= {h.result}</span>
+                    <div>
+                      <span className="history-exp">{h.expression}</span>
+                      <span className="history-res">= {h.result}</span>
+                    </div>
+                    <div className="history-details" style={{
+                      fontSize: "0.78em",
+                      color: "#888",
+                      paddingLeft: 2,
+                      marginTop: 3
+                    }}>
+                      {h.username
+                        ? <>by <b>{h.username}</b>  {new Date(h.createdAt).toLocaleString()}</>
+                        : <> {new Date(h.createdAt).toLocaleString()}</>
+                      }
+                    </div>
                   </li>
                 ))}
               </ul>
