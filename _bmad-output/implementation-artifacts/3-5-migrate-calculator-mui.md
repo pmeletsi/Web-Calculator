@@ -75,7 +75,7 @@ so that **the calculator matches PRD scope (FR2: only `+ - * /`) and is ready fo
 │                                                                  │
 │  ┌────────────────────────────────────────────────────────────┐  │
 │  │                                          12 + 4 × (3 - 1)  │  │ ← <Paper> "display"
-│  │                                                       16   │  │
+│  │                                                       20   │  │
 │  └────────────────────────────────────────────────────────────┘  │
 │                                                                  │
 │  ┌──────┐  ┌──────┐  ┌──────┐  ┌──────┐                          │
@@ -132,7 +132,7 @@ return (
     {/* AppBar + Container + Paper above … */}
     <Grid container spacing={1}>
       {keys.map((k, i) => (
-        <Grid item xs={3} key={i}>
+        <Grid size={3} key={i}>
           {k && (
             <Button
               fullWidth size="large"
@@ -147,13 +147,13 @@ return (
       ))}
 
       {/* row 5 — special widths */}
-      <Grid item xs={6}>
+      <Grid size={6}>
         <Button fullWidth size="large" variant="outlined" onClick={() => handleClick('0')}>0</Button>
       </Grid>
-      <Grid item xs={3}>
+      <Grid size={3}>
         <Button fullWidth size="large" variant="outlined" onClick={() => handleClick('.')}>.</Button>
       </Grid>
-      <Grid item xs={3}>
+      <Grid size={3}>
         <Button
           fullWidth size="large"
           variant="contained" color="primary"
@@ -225,6 +225,12 @@ const handleCalculate = () => {
   }
 };
 ```
+
+### MUI v7 Grid API note
+
+Story 3.1 installs MUI v7. In v7 the `Grid` component uses the **Grid v2 API**: `<Grid size={3}>` (no `item` prop, no `xs`). The legacy v5/v6 syntax `<Grid item xs={3}>` only works via `import { GridLegacy as Grid } from '@mui/material'` and is deprecated. If you copy MUI examples from older blog posts and see `item xs={...}`, translate to `size={...}`.
+
+For responsive widths (not used here): `<Grid size={{ xs: 12, md: 6 }}>`.
 
 ### Why operator label vs value differ
 

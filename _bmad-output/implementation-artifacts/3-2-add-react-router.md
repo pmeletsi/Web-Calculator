@@ -33,7 +33,7 @@ so that **each screen is independently addressable, the URL reflects state, and 
 - [ ] **Task 3 — Create `src/pages/Login.jsx`** (AC: 3)
   - [ ] Move the body of the existing `src/Login.jsx` here.
   - [ ] Accept an `onLogin` callback as a prop (same signature as today).
-  - [ ] After successful login, call `useNavigate()(\`/\`, { replace: true })`.
+  - [ ] After successful login, call `navigate('/', { replace: true })` where `navigate = useNavigate()`.
   - [ ] Delete the old `src/Login.jsx` (or re-export from there for one PR transition; preferred: delete in this PR).
 
 - [ ] **Task 4 — Create `src/pages/Calculator.jsx`** (AC: 3, 5)

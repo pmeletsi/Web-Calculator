@@ -84,8 +84,8 @@ This mirrors Epics 1-8 but condensed — the architecture is already proven, so 
 
 | # | Feature | Original story | Copilot lever to try |
 |---|---|---|---|
-| 1 | Repo + `.gitignore` + README + PR template | 1.3, 1.5 | Autocomplete `.gitignore` (Vite + .NET), PR template body |
-| 2 | Decisions doc (D1-D7 copy-over) | 1.3 | Chat: "Summarise these 7 decisions in a docs/decisions.md page" |
+| 1 | Repo + `.gitignore` + README + PR template | 1.1, 1.2 | Autocomplete `.gitignore` (Vite + .NET), PR template body |
+| 2 | Decisions doc (D1-D7 copy-over) | 1.2 | Chat: "Summarise these 7 decisions in a docs/decisions.md page" |
 | 3 | .NET solution scaffold | 4.1 | `dotnet new` is hand-CLI; Chat for project-reference graph |
 | 4 | EF Core + DbContext + entities | 4.2, 4.3 | Autocomplete the entity classes from a one-line comment |
 | 5 | DataSeeder | 4.4 | Chat: "Write a BCrypt-hashing seeder for two users" |
@@ -93,9 +93,9 @@ This mirrors Epics 1-8 but condensed — the architecture is already proven, so 
 | 7 | Auth (login + JWT + middleware) | 5.2, 5.3 | Hand-write JWT issuance — Copilot's first suggestions tend to skip claim hardening |
 | 8 | CalculationsController + service | 5.4, 5.5 | Copilot writes the controller pattern in seconds |
 | 9 | React + MUI + Router scaffold | 3.1, 3.2 | Autocomplete; Chat: "wrap App in ThemeProvider + AuthProvider" |
-| 10 | Login page (MUI) | 3.3, 6.2 | Autocomplete the form is fast |
-| 11 | Calculator page (MUI keypad) | 3.4, 6.3 | Generate the keypad array from a one-line comment |
-| 12 | History page (MUI Table + paging) | 3.5, 6.4 | Autocomplete the table; **verify pagination math by hand** |
+| 10 | Login page (MUI) + wire to API | 3.4, 6.2 | Autocomplete the form is fast |
+| 11 | Calculator page (MUI keypad) + wire to API | 3.5, 6.3 | Generate the keypad array from a one-line comment |
+| 12 | History page (MUI Table + paging) + wire to API | 3.6, 6.4 | Autocomplete the table; **verify pagination math by hand** |
 | 13 | Vitest + RTL tests | 7.3 | Chat: `/tests` for each page |
 | 14 | CI workflows | 8.1 | Generate `backend.yml` + `frontend.yml` from a comment |
 

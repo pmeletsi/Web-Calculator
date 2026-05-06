@@ -23,7 +23,7 @@ so that **PRD FR2 (calculator), FR3 (audit), and FR5 (validation) are all satisf
    - Calls `CalculationService.CalculateAsync(...)`.
    - Returns `200 { id, expression, result, createdAt, username }` on success, or `400 { reason, message }` on validation failure.
 5. `CalculationService` registered as `AddScoped` in `Program.cs`.
-6. End-to-end smoke: with a valid JWT (from Story 5.2's login), `POST /api/calculations` with `{ "expression": "12 + 4 * (3 - 1)" }` returns `200` and the response shows `result = 16`. Without a JWT it returns `401`.
+6. End-to-end smoke: with a valid JWT (from Story 5.2's login), `POST /api/calculations` with `{ "expression": "12 + 4 * (3 - 1)" }` returns `200` and the response shows `result = 20`. Without a JWT it returns `401`.
 
 ## Tasks / Subtasks
 
@@ -48,7 +48,7 @@ so that **PRD FR2 (calculator), FR3 (audit), and FR5 (validation) are all satisf
 - [ ] **Task 6 — Smoke-test end-to-end** (AC: 6)
   - [ ] Start the app: `dotnet run --project backend/WebCalculator.Api`.
   - [ ] Login: `curl -X POST http://localhost:5000/api/auth/login -H "Content-Type: application/json" -d '{"username":"evi","password":"1234"}'` → capture `token`.
-  - [ ] Calculate: `curl -X POST http://localhost:5000/api/calculations -H "Authorization: Bearer <token>" -H "Content-Type: application/json" -d '{"expression":"12 + 4 * (3 - 1)"}'` → expect `result: 16`.
+  - [ ] Calculate: `curl -X POST http://localhost:5000/api/calculations -H "Authorization: Bearer <token>" -H "Content-Type: application/json" -d '{"expression":"12 + 4 * (3 - 1)"}'` → expect `result: 20`.
   - [ ] Validation failure: `... -d '{"expression":"1++2"}'` → `400 { "reason": "DoubledOperator", ... }`.
   - [ ] Without bearer: `curl ... /api/calculations -d '{...}'` → `401`.
   - [ ] Confirm a new row in `Calculations` via `sqlcmd -S "(localdb)\MSSQLLocalDB" -d WebCalculator -Q "SELECT TOP 5 * FROM Calculations ORDER BY CreatedAt DESC"`.

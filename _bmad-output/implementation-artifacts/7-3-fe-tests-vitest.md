@@ -145,9 +145,11 @@ describe('Calculator', () => {
     localStorage.clear();
   });
 
-  it('renders display and the digit / operator keys', () => {
+  it('renders the digit / operator keys', () => {
     renderCalc();
-    expect(screen.getByText('0')).toBeInTheDocument();        // initial display
+    // Use getByRole('button', …) — getByText('0') would be ambiguous because both
+    // the display Typography and the '0' keypad button render text "0".
+    expect(screen.getByRole('button', { name: '0' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '7' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '×' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '=' })).toBeInTheDocument();

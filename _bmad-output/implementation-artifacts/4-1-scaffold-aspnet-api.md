@@ -43,11 +43,9 @@ so that **all subsequent backend stories have a stable, intern-friendly skeleton
     dotnet new webapi -n WebCalculator.Api   -o backend/WebCalculator.Api   --use-controllers --framework net8.0
     dotnet new xunit  -n WebCalculator.Tests -o backend/WebCalculator.Tests --framework net8.0
     ```
-  - [ ] Add to solution:
+  - [ ] Add to solution (single line — works in bash, PowerShell, and cmd):
     ```bash
-    dotnet sln backend/WebCalculator.sln add `
-      backend/WebCalculator.Api/WebCalculator.Api.csproj `
-      backend/WebCalculator.Tests/WebCalculator.Tests.csproj
+    dotnet sln backend/WebCalculator.sln add backend/WebCalculator.Api/WebCalculator.Api.csproj backend/WebCalculator.Tests/WebCalculator.Tests.csproj
     ```
 
 - [ ] **Task 3 — Wire test project reference** (AC: 3)

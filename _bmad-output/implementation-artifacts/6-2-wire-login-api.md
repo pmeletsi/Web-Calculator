@@ -88,10 +88,11 @@ const Login = () => {
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', p: 2 }}>
+    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 2 }}>
+      <Typography variant="h4" align="center" sx={{ mb: 3 }}>Web Calculator</Typography>
+
       <Card sx={{ p: 4, maxWidth: 400, width: '100%' }}>
         <Stack spacing={2} component="form" onSubmit={handleSubmit}>
-          <Typography variant="h4" align="center">Web Calculator</Typography>
           <Typography variant="h6" align="center" color="text.secondary">Sign in to continue</Typography>
 
           <TextField

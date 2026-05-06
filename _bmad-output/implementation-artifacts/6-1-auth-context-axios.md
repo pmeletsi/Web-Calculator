@@ -23,7 +23,7 @@ so that **Stories 6.2 / 6.3 / 6.4 can call the backend with one line each — an
    - `<RequireAuth>` reads `user` from `useAuth()` instead of `localStorage` directly.
 5. The `Logout` buttons in `pages/Calculator.jsx` and `pages/History.jsx` call `useAuth().logout()` (no `onLogout` prop chain).
 6. End-to-end smoke (with Stories 4.x + 5.x backend running): log in via the existing flow → token visible in `localStorage["token"]` → opening any protected route while token is removed redirects to `/login`.
-7. **No `localStorage["user"]` reads or writes remain outside `AuthContext`** (grep the codebase).
+7. **No `localStorage["user"]` reads or writes remain outside `AuthContext.jsx`** — except `apiClient.js`'s 401 response interceptor (added in this story, AC 3), which clears both `token` and `user` on auth failure. Grep the codebase to confirm only those two files touch the keys.
 
 ## Tasks / Subtasks
 

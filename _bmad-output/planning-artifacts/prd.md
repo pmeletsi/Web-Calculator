@@ -73,7 +73,7 @@ The repository already contains a partial frontend that Evi has built. We are **
 | G2 | Every calculation is auditable                                        | Each result is persisted with `expression`, `result`, `username`, `createdAt`; visible in History page and queryable in DB |
 | G3 | Invalid expressions cannot reach evaluation                           | Server rejects malformed expressions with HTTP 400; client disables submit while invalid                                   |
 | G4 | The trainee practices a professional workflow                         | Branch + PR per story file; commits carry story IDs; SonarLint clean; multi-env config without code changes                |
-| G5 | The build is reproducible and automated                               | CI pipeline compiles, tests, and packages both apps on every PR to `develop`                                               |
+| G5 | The build is reproducible and automated                               | CI pipeline compiles, tests, and packages both apps on every PR to `main` (no `develop` per §11 C7)                        |
 | G6 | Phase 4 AI re-implementation is delivered in a separate repo          | New repo contains a Copilot-assisted rebuild plus a short reflection                                                       |
 
 ---
@@ -96,7 +96,7 @@ The repository already contains a partial frontend that Evi has built. We are **
 - Multi-environment configuration without code changes
 - Unit tests for decoupled units
 - CI pipeline (compile, build, package, unit tests)
-- ER-Diagram, Wireframes, Wiki
+- ER-Diagram (inline in Story 4.3), Wireframes (inline in Stories 3.4 / 3.5 / 3.6), and project documentation in `README.md` + `docs/decisions.md` (replaces the brief's separate Wiki — see §11 C7)
 - AI-assisted re-implementation in a new repo (Phase 4)
 
 ### Out of scope (explicit)
@@ -134,7 +134,7 @@ The repository already contains a partial frontend that Evi has built. We are **
 | NFR6 | Multi-environment configuration without code changes                         | Backend: `appsettings.{Environment}.json`. Frontend: `.env.{mode}` files consumed by Vite                                 |
 | NFR7 | Code is decoupled enough for unit tests                                      | Layered backend (Controller → Service → DbContext via EF Core); React presentation components separated from data hooks   |
 | NFR8 | An ORM is used for DB interaction                                            | EF Core code-first migrations; raw SQL scripts also committed under `/sql/` to satisfy the brief's "sql scripts" clause   |
-| NFR9 | CI pipeline performs compile, build, package, unit tests                     | GitHub Actions workflows on PR to `develop` and on push to `develop`/`main`                                               |
+| NFR9 | CI pipeline performs compile, build, package, unit tests                     | GitHub Actions workflows on PR to `main` and on push to `main` (no `develop` per §11 C7)                                  |
 
 ---
 
@@ -231,7 +231,7 @@ See `epics.md` for the full epic and story breakdown.
 | Risk                                                                   | Impact                | Mitigation                                                                                        |
 |------------------------------------------------------------------------|-----------------------|---------------------------------------------------------------------------------------------------|
 | Trainee evaluates expressions with `eval()` (security flaw)            | High — code injection | Mandatory: backend uses a safe parser/evaluator (e.g. NCalc or shunting-yard); never `eval`       |
-| Plaintext passwords in the seed script                                 | High — credential leak | Seeded passwords are hashed (BCrypt) at seed time; plaintext lives only in the README setup notes |
+| Plaintext passwords in the seed script                                 | High — credential leak | Seeded passwords are hashed (BCrypt) at seed time; plaintext lives only in `DataSeeder.cs` and `docs/scripted-users.md`, both clearly marked dev-only |
 | Story-to-commit traceability lost                                      | Medium                | Branch + PR title naming convention (`feature/<story-id>-<slug>`); coach reviews each PR before merge |
 | Scope creep beyond the brief                                           | Medium                | This PRD is the source of truth; anything outside §4 In-scope is rejected                         |
 

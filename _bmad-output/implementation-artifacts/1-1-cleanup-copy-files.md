@@ -54,7 +54,7 @@ so that **the repo is unambiguous and contributors don't accidentally edit the w
 
 - [ ] **Task 6 — Commit and open the PR** (AC: all)
   - [ ] Branch: `feature/1.1-cleanup-copy-files`
-  - [ ] Commit: `[1.5] Remove accidental _copy duplicate files`
+  - [ ] Commit: `[1.1] Remove accidental _copy duplicate files`
   - [ ] PR title: `[Story 1.1] Remove accidental _copy duplicate files`
   - [ ] PR description: list the 7 files removed and a screenshot showing `npm run build` succeeded.
 

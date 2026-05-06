@@ -62,7 +62,7 @@ so that **the validator is reusable, regression-safe, and the project has a work
 // Validates an arithmetic expression made of digits, the four operators (+ - * /),
 // decimal points, parentheses are NOT allowed at this point (no paren keys yet),
 // and whitespace. Mirrors PRD FR5; the canonical server-side validator lives in
-// WebCalculator.Domain.ExpressionValidator (Story 5.1).
+// WebCalculator.Api.Services.ExpressionValidator (Story 5.1).
 export function isValidExpression(expr) {
   if (!expr || expr.trim() === '') return false;
   if (/[+\-*/.]$/.test(expr)) return false;                         // trailing operator/decimal
