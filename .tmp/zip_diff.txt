@@ -1,0 +1,51 @@
+original parts: 62
+new parts: 47
+-- only in original --
+  xl/calcChain.xml
+  xl/comments1.xml
+  xl/comments2.xml
+  xl/comments3.xml
+  xl/comments4.xml
+  xl/comments5.xml
+  xl/comments6.xml
+  xl/comments7.xml
+  xl/comments8.xml
+  xl/drawings/drawing2.xml
+  xl/drawings/drawing3.xml
+  xl/drawings/vmlDrawing1.vml
+  xl/drawings/vmlDrawing2.vml
+  xl/drawings/vmlDrawing3.vml
+  xl/drawings/vmlDrawing4.vml
+  xl/drawings/vmlDrawing5.vml
+  xl/drawings/vmlDrawing6.vml
+  xl/drawings/vmlDrawing7.vml
+  xl/drawings/vmlDrawing8.vml
+  xl/printerSettings/printerSettings1.bin
+  xl/printerSettings/printerSettings2.bin
+  xl/printerSettings/printerSettings3.bin
+  xl/printerSettings/printerSettings4.bin
+  xl/printerSettings/printerSettings5.bin
+  xl/printerSettings/printerSettings6.bin
+  xl/printerSettings/printerSettings7.bin
+  xl/printerSettings/printerSettings8.bin
+  xl/printerSettings/printerSettings9.bin
+  xl/sharedStrings.xml
+  xl/worksheets/_rels/sheet10.xml.rels
+  xl/worksheets/_rels/sheet9.xml.rels
+-- only in new --
+  xl/comments/comment1.xml
+  xl/comments/comment2.xml
+  xl/comments/comment3.xml
+  xl/comments/comment4.xml
+  xl/comments/comment5.xml
+  xl/comments/comment6.xml
+  xl/comments/comment7.xml
+  xl/comments/comment8.xml
+  xl/drawings/commentsDrawing1.vml
+  xl/drawings/commentsDrawing2.vml
+  xl/drawings/commentsDrawing3.vml
+  xl/drawings/commentsDrawing4.vml
+  xl/drawings/commentsDrawing5.vml
+  xl/drawings/commentsDrawing6.vml
+  xl/drawings/commentsDrawing7.vml
+  xl/drawings/commentsDrawing8.vml

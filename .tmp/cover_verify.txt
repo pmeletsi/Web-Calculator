@@ -1,0 +1,15 @@
+B11='Φορέας Απασχόλησης'
+A12=1
+B12='PricewaterhouseCoopers Business Solutions Α.Ε.'
+D12='επωνυμία'
+A13=2
+B13='Λεωφ. Κηφισίας 268, 152 32 Χαλάνδρι'
+D13='διεύθυνση'
+A14=3
+B14='+30 210 6874400 / pwc.greece@gr.pwc.com'
+D14='τηλέφωνο & email'
+B16='Επόπτης Απασχ/μενου'
+B17='Ονομ/νυμο:'
+C17='Τσίχλης Ηλίας'
+B18='Ιδιότητα:'
+C18='Engineering Manager / Staff Engineer'

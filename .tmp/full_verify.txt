@@ -1,0 +1,27 @@
+=== Cover (πλήρης κατάσταση) ===
+  C5 = 'Μελέτση'
+  C6 = 'Παρασκευή'
+  C7 = 'Τεχνολογιών Πληροφορικής και Επικοινωνιών'
+  C8 = 'Ψηφιακών Συστημάτων'
+  C9 = '3122067'
+  B12 = 'PricewaterhouseCoopers Business Solutions Α.Ε.'
+  B13 = 'Λεωφ. Κηφισίας 268, 152 32 Χαλάνδρι'
+  B14 = '+30 210 6874400 / pwc.greece@gr.pwc.com'
+  C17 = 'Τσίχλης Ηλίας'
+  C18 = 'Engineering Manager / Staff Engineer'
+  C20 = datetime.datetime(2026, 3, 16, 0, 0)
+  C21 = '=C20-WEEKDAY(C20,2)+1'
+  C22 = 5.5
+  C23 = '=NETWORKDAYS(C20,C24,holidays)'
+  C24 = datetime.datetime(2026, 8, 31, 0, 0)
+  C29 = '=extra!L69'
+  B35 = '- Πανεπιστήμιο Πειραιώς -'
+
+=== Month-sheet D3 (Δευτέρα 1ης εβδ. κάθε φύλλου) ===
+  1ος!D3 = "='Στοιχεία Πρακτικής'!C21"
+  2ος!D3 = datetime.datetime(2026, 3, 30, 0, 0)
+  3ος!D3 = datetime.datetime(2026, 4, 27, 0, 0)
+  4ος!D3 = datetime.datetime(2026, 6, 1, 0, 0)
+  5ος!D3 = datetime.datetime(2026, 6, 29, 0, 0)
+  6ος!D3 = datetime.datetime(2026, 8, 3, 0, 0)
+  extra!D3 = None
