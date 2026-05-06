@@ -1,0 +1,79 @@
+# BMad Sprint Status — Web Calculator
+# Tracks the lifecycle status of every story in the development pipeline.
+#
+# STATUS DEFINITIONS
+#   backlog        — Identified in epics.md, not yet contextualised into a story file
+#   ready-for-dev  — Story file created with full implementation context
+#   in-progress    — Active development underway (branch open, work in flight)
+#   in-review      — PR open, awaiting coach review
+#   done           — Merged + acceptance criteria met
+#
+# Epic statuses follow the same lifecycle.
+#
+# Total: 8 active epics, 29 stories.
+# Story IDs are in serial pickup order — read the entries top-to-bottom for the order Evi works.
+# Epic 2 (separate ER/Wireframe documents) was dropped per PRD §11 C7;
+# diagrams now live inline in their owning stories (ERD in 4.3; wireframes in 3.4/3.5/3.6).
+# Epic 8 was trimmed to a single combined CI workflow story (BE + FE in one branch).
+
+last_updated: 2026-05-06
+project: Web Calculator
+total_epics: 8
+total_stories: 29
+
+development_status:
+  # ===== Epic 1 — Foundation (cleanup + README) =====
+  epic-1: in-progress
+  1-1-cleanup-copy-files: ready-for-dev
+  1-2-readme-and-setup: ready-for-dev
+
+  # ===== Epic 2 — DROPPED (see header note) =====
+  # Diagrams live inline in their owning stories.
+
+  # ===== Epic 3 — Frontend Modernisation =====
+  epic-3: in-progress
+  3-1-install-material-ui: ready-for-dev
+  3-2-add-react-router: ready-for-dev
+  3-3-multi-env-config: ready-for-dev
+  3-4-migrate-login-mui: ready-for-dev
+  3-5-migrate-calculator-mui: ready-for-dev
+  3-6-migrate-history-mui: ready-for-dev
+  3-7-extract-validator-vitest: ready-for-dev
+
+  # ===== Epic 4 — Backend Foundation =====
+  epic-4: in-progress
+  4-1-scaffold-aspnet-api: ready-for-dev
+  4-2-efcore-sqlserver-connection: ready-for-dev
+  4-3-users-calculations-tables: ready-for-dev
+  4-4-seed-users-bcrypt: ready-for-dev
+
+  # ===== Epic 5 — Backend APIs =====
+  epic-5: in-progress
+  5-1-expression-validator: ready-for-dev
+  5-2-auth-login-jwt: ready-for-dev
+  5-3-jwt-middleware: ready-for-dev
+  5-4-calculations-post: ready-for-dev
+  5-5-calculations-get: ready-for-dev
+
+  # ===== Epic 6 — Frontend ↔ Backend Wiring =====
+  epic-6: in-progress
+  6-1-auth-context-axios: ready-for-dev
+  6-2-wire-login-api: ready-for-dev
+  6-3-wire-calculator-api: ready-for-dev
+  6-4-wire-history-api: ready-for-dev
+
+  # ===== Epic 7 — Quality & Tests =====
+  epic-7: in-progress
+  7-1-be-tests-validator: ready-for-dev
+  7-2-be-tests-auth: ready-for-dev
+  7-3-fe-tests-vitest: ready-for-dev
+  7-4-sonarlint-clean: ready-for-dev
+
+  # ===== Epic 8 — CI/CD =====
+  epic-8: in-progress
+  8-1-ci-workflow: ready-for-dev
+
+  # ===== Epic 9 — AI Re-implementation =====
+  epic-9: in-progress
+  9-1-ai-rebuild: ready-for-dev
+  9-2-ai-reflection: ready-for-dev
