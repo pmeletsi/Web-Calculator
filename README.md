@@ -63,6 +63,8 @@ npm run dev
 
 http://localhost:5173
 
+FE reads `VITE_API_BASE_URL` from `.env.development` (used by `npm run dev`) or `.env.production` (used by `npm run build`). Personal overrides go in `.env.local` (gitignored).
+
 ---
 
 ### Backend _(after Story 4.1)_
