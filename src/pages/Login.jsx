@@ -1,91 +1,91 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  Box,
+  Card,
+  TextField,
+  Button,
+  Typography,
+  Alert,
+  Stack,
+} from '@mui/material';
+
+// TODO(6.2): replace with API call to POST /api/auth/login
+const users = [
+  { username: 'evi', password: '1234' },
+  { username: 'nik', password: '5678' },
+];
 
 const Login = ({ onLogin }) => {
-  const navigate = useNavigate();
-
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [inputUser, setInputUser] = useState('');
+  const [inputPass, setInputPass] = useState('');
   const [error, setError] = useState('');
-
-  // TODO(6.2): replace with API call
-  const users = [
-    { username: 'evi', password: '1234' },
-  ];
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const validUser = users.find(
-      (u) => u.username === username && u.password === password
+    const found = users.find(
+      (u) => u.username === inputUser && u.password === inputPass
     );
 
-    if (validUser) {
-      onLogin(username);
+    if (found) {
+      onLogin(inputUser);
       navigate('/', { replace: true });
     } else {
-      setError('Invalid username or password');
+      setError('Invalid credentials');
     }
   };
 
   return (
-    <div className="calculator-container">
-      <div className="calculator">
-        <h2 style={{ textAlign: 'center', marginBottom: 20 }}>
-          Login
-        </h2>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        p: 2,
+      }}
+    >
+      <Typography variant="h4" align="center" sx={{ mb: 3 }}>
+        Web Calculator
+      </Typography>
 
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            style={{
-              width: '100%',
-              padding: 10,
-              marginBottom: 10,
-              borderRadius: 8,
-              border: '1px solid #ccc',
-            }}
+      <Card sx={{ p: 4, maxWidth: 400, width: '100%' }}>
+        <Stack spacing={2} component="form" onSubmit={handleSubmit}>
+
+          <Typography variant="h6" align="center" color="text.secondary">
+            Sign in to continue
+          </Typography>
+
+          <TextField
+            label="Username"
+            autoFocus
+            required
+            fullWidth
+            value={inputUser}
+            onChange={(e) => setInputUser(e.target.value)}
           />
 
-          <input
+          <TextField
+            label="Password"
             type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={{
-              width: '100%',
-              padding: 10,
-              marginBottom: 10,
-              borderRadius: 8,
-              border: '1px solid #ccc',
-            }}
+            required
+            fullWidth
+            value={inputPass}
+            onChange={(e) => setInputPass(e.target.value)}
           />
 
-          <button
-            type="submit"
-            className="btn control"
-            style={{ width: '100%' }}
-          >
+          <Button variant="contained" type="submit" fullWidth size="large">
             Login
-          </button>
+          </Button>
 
-          {error && (
-            <div
-              style={{
-                color: 'red',
-                marginTop: 10,
-                textAlign: 'center',
-              }}
-            >
-              {error}
-            </div>
-          )}
-        </form>
-      </div>
-    </div>
+           {error && <Alert severity="error">Invalid credentials</Alert>}
+
+        </Stack>
+      </Card>
+    </Box>
   );
 };
 
