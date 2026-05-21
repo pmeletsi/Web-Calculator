@@ -10,15 +10,8 @@ import {
   Button
 } from '@mui/material';
 
-const isValidExpression = (expr) => {
-  if (!expr || expr.trim() === '') return false;
-  if (/[+\-*/.]$/.test(expr)) return false;
-  if (/([+\-*/]{2,})/.test(expr.replace(/--/g, ''))) return false;
-  if (/\.\./.test(expr)) return false;
-  if (/[^0-9+\-*/.\s]/.test(expr)) return false;
-  if (/\/0(?![0-9.])/.test(expr)) return false;
-  return true;
-};
+import { isValidExpression } from '../lib/expressionValidator';
+
 
 const Calculator = ({ user, history, setHistory, onLogout }) => {
   const [input, setInput] = useState('');
@@ -79,7 +72,7 @@ const Calculator = ({ user, history, setHistory, onLogout }) => {
 
   return (
     <>
-      {/* ✅ AppBar */}
+      {/*AppBar */}
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
