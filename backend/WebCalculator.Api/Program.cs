@@ -1,8 +1,12 @@
+using Microsoft.EntityFrameworkCore;
+using WebCalculator.Api.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-// TODO(4.2): builder.Services.AddDbContext<AppDbContext>(...);
+builder.Services.AddDbContext<AppDbContext>(opts =>
+    opts.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 // TODO(5.3): CORS for the Vite dev server origin.
 
 var app = builder.Build();
