@@ -1,6 +1,10 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\backend",
+    "\\backend\\WebCalculator.Api",
+    "\\backend\\WebCalculator.Api\\Migrations"
   ],
+  "SelectedNode": "\\backend\\WebCalculator.Api\\Migrations\\InitialCreate.Designer.cs",
   "PreviewInSolutionExplorer": false
 }
