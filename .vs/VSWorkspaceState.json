@@ -3,8 +3,9 @@
     "",
     "\\backend",
     "\\backend\\WebCalculator.Api",
+    "\\backend\\WebCalculator.Api\\Data",
     "\\backend\\WebCalculator.Api\\Migrations"
   ],
-  "SelectedNode": "\\backend\\WebCalculator.Api\\Migrations\\InitialCreate.Designer.cs",
+  "SelectedNode": "\\backend\\WebCalculator.Api\\Data\\User.cs",
   "PreviewInSolutionExplorer": false
 }
