@@ -14,4 +14,14 @@ var app = builder.Build();
 app.MapGet("/healthz", () => Results.Ok(new { status = "healthy" }));
 app.MapControllers();
 
+using (var scope = app.Services.CreateScope())
+{
+    var sp = scope.ServiceProvider;
+    var db = sp.GetRequiredService<AppDbContext>();
+    var logger = sp.GetRequiredService<ILogger<Program>>();
+
+    await db.Database.MigrateAsync();
+    await DataSeeder.SeedAsync(db, logger);
+}
+
 app.Run();

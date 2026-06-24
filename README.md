@@ -9,6 +9,8 @@ PwC junior-developer training exercise — a web calculator with login, history,
 Authoritative documentation:  
 [PRD](_bmad-output/planning-artifacts/prd.md) · [Epics + serial roadmap](_bmad-output/planning-artifacts/epics.md) · [Decisions](docs/decisions.md)
 
+- [docs/scripted-users.md](docs/scripted-users.md) — dev credentials and how seeding works
+
 ---
 
 ## Getting Started
