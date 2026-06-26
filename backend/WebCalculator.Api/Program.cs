@@ -10,6 +10,7 @@ builder.Services.AddDbContext<AppDbContext>(opts =>
     opts.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
 builder.Services.AddSingleton<ExpressionValidator>();
+builder.Services.AddScoped<AuthService>();
 // TODO(5.3): CORS for the Vite dev server origin.
 
 var app = builder.Build();
