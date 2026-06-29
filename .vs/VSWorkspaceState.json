@@ -10,5 +10,6 @@
     "\\backend\\WebCalculator.Tests",
     "\\backend\\WebCalculator.Tests\\Services"
   ],
+  "SelectedNode": "\\backend\\WebCalculator.Api\\Program.cs",
   "PreviewInSolutionExplorer": false
 }

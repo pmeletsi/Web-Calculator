@@ -15,6 +15,7 @@ builder.Services.AddDbContext<AppDbContext>(opts =>
 
 builder.Services.AddSingleton<ExpressionValidator>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<CalculationService>();
 
 // CORS
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
@@ -41,7 +42,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
-            NameClaimType = JwtRegisteredClaimNames.Sub,
+            NameClaimType = JwtRegisteredClaimNames.UniqueName,
         };
     });
 builder.Services.AddAuthorization();
