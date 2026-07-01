@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
 using WebCalculator.Api.Models;
 using WebCalculator.Api.Services;
 
@@ -17,8 +18,8 @@ public class CalculationsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CalculationRequest request, CancellationToken ct)
     {
-        var username = User.Identity!.Name!;                                  // unique_name claim, set by middleware
-        var userId   = int.Parse(User.FindFirst("uid")!.Value);              
+        var userId   = int.Parse(User.Identity!.Name!);                       // Sub claim = user.Id (set by middleware)
+        var username = User.FindFirst(JwtRegisteredClaimNames.UniqueName)!.Value;
 
         var (validation, result) = await _service.CalculateAsync(request.Expression, userId, username, ct);
 
