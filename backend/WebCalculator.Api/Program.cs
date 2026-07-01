@@ -15,6 +15,7 @@ builder.Services.AddDbContext<AppDbContext>(opts =>
 
 builder.Services.AddSingleton<ExpressionValidator>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<CalculationService>();
 
 // CORS
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
