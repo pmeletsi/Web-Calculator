@@ -30,4 +30,18 @@ public class CalculationsController : ControllerBase
 
         return Ok(result);
     }
+
+    [HttpGet]
+    public async Task<IActionResult> List(
+        [FromQuery] string? username,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        CancellationToken ct = default)
+    {
+        if (page < 1) page = 1;
+        if (pageSize < 1 || pageSize > 100) pageSize = 20;
+
+        var result = await _service.GetAsync(username, page, pageSize, ct);
+        return Ok(result);
+    }
 }

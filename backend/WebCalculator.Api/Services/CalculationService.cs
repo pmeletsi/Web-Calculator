@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using NCalc;
 using WebCalculator.Api.Data;
 using WebCalculator.Api.Models;
@@ -46,5 +47,28 @@ public class CalculationService
         await _db.SaveChangesAsync(ct);
 
         return (validation, new CalculationResponse(calc.Id, calc.Expression, calc.Result, calc.CreatedAt, calc.Username));
+    }
+
+    public async Task<PagedResult<CalculationResponse>> GetAsync(
+        string? username, int page, int pageSize, CancellationToken ct)
+    {
+        var query = _db.Calculations.AsNoTracking().AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(username))
+        {
+            var term = $"%{username}%";
+            query = query.Where(c => EF.Functions.Like(c.Username, term));
+        }
+
+        var total = await query.CountAsync(ct);
+
+        var items = await query
+            .OrderByDescending(c => c.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(c => new CalculationResponse(c.Id, c.Expression, c.Result, c.CreatedAt, c.Username))
+            .ToListAsync(ct);
+
+        return new PagedResult<CalculationResponse>(items, total);
     }
 }
