@@ -1,56 +1,96 @@
+﻿import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import {
+  AppBar, Toolbar, Typography, Button, Container, TextField, Stack,
+  TableContainer, Table, TableHead, TableBody, TableRow, TableCell, TablePagination, Paper,
+} from '@mui/material';
 import { useAuth } from '../lib/AuthContext.jsx';
 
 const HistoryPage = ({ history, clearHistory }) => {
   const { logout } = useAuth();
 
+  // TODO(6.4): replace local history prop with GET /api/calculations
+  const [searchInput, setSearchInput] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(20);
+
+  // Debounce the search input
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchInput.trim().toLowerCase()), 300);
+    return () => clearTimeout(t);
+  }, [searchInput]);
+
+  // Reset page when search changes
+  useEffect(() => { setPage(0); }, [debouncedSearch]);
+
+  const filtered = !debouncedSearch
+    ? history
+    : history.filter((h) => (h.username || '').toLowerCase().includes(debouncedSearch));
+
+  const paged = filtered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+
+  const fmtDate = (iso) => new Date(iso).toLocaleString();
+
   return (
-    <div className="calculator-container">
-      <div className="calculator">
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          marginBottom: 8,
-        }}>
-          <Link to="/" className="btn control" style={{ textDecoration: 'none' }}>Calculator</Link>
-          <button className="btn control" onClick={logout}>Logout</button>
-        </div>
-        <div className="history">
-          <div className="history-header">
-            <span>History</span>
-            <button className="btn control" onClick={clearHistory}>
-              Clear
-            </button>
-          </div>
-          {history.length === 0 ? (
-            <div className="history-empty">No calculations yet.</div>
-          ) : (
-            <ul className="history-list">
-              {history.slice(0, 8).map((h, idx) => (
-                <li key={idx} className="history-item" title="Calculation history item">
-                  <div>
-                    <span className="history-exp">{h.expression}</span>
-                    <span className="history-res">= {h.result}</span>
-                  </div>
-                  <div className="history-details" style={{
-                    fontSize: '0.78em',
-                    color: '#888',
-                    paddingLeft: 2,
-                    marginTop: 3,
-                  }}>
-                    {h.username
-                      ? <>by <b>{h.username}</b>  {new Date(h.createdAt).toLocaleString()}</>
-                      : <> {new Date(h.createdAt).toLocaleString()}</>
-                    }
-                  </div>
-                </li>
+    <>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>Web Calculator - History</Typography>
+          <Button color="inherit" component={Link} to="/">Calculator</Button>
+          <Button color="inherit" onClick={logout}>Logout</Button>
+        </Toolbar>
+      </AppBar>
+
+      <Container maxWidth="lg" sx={{ mt: 3 }}>
+        <Stack direction="row" spacing={2} sx={{ mb: 2 }} alignItems="center">
+          <TextField
+            label="Search by username"
+            size="small"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            sx={{ flexGrow: 1 }}
+          />
+          <Button color="warning" variant="outlined" onClick={clearHistory}>Clear</Button>
+        </Stack>
+
+        <TableContainer component={Paper}>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>Timestamp</TableCell>
+                <TableCell>Username</TableCell>
+                <TableCell>Expression</TableCell>
+                <TableCell align="right">Result</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {paged.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} align="center">No calculations to show.</TableCell>
+                </TableRow>
+              ) : paged.map((h, i) => (
+                <TableRow key={`${h.createdAt}-`}>
+                  <TableCell>{fmtDate(h.createdAt)}</TableCell>
+                  <TableCell>{h.username || '\u2014'}</TableCell>
+                  <TableCell sx={{ fontFamily: 'monospace' }}>{h.expression}</TableCell>
+                  <TableCell align="right">{h.result}</TableCell>
+                </TableRow>
               ))}
-            </ul>
-          )}
-        </div>
-      </div>
-    </div>
+            </TableBody>
+          </Table>
+          <TablePagination
+            component="div"
+            count={filtered.length}
+            page={page}
+            onPageChange={(_, p) => setPage(p)}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={(e) => { setRowsPerPage(+e.target.value); setPage(0); }}
+            rowsPerPageOptions={[10, 20, 50]}
+          />
+        </TableContainer>
+      </Container>
+    </>
   );
 };
 

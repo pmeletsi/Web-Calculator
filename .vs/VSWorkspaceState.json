@@ -1,6 +1,14 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\backend",
+    "\\backend\\WebCalculator.Api",
+    "\\backend\\WebCalculator.Api\\Data",
+    "\\backend\\WebCalculator.Api\\Migrations",
+    "\\backend\\WebCalculator.Api\\Properties",
+    "\\backend\\WebCalculator.Api\\Services",
+    "\\backend\\WebCalculator.Tests",
+    "\\backend\\WebCalculator.Tests\\Services"
   ],
   "PreviewInSolutionExplorer": false
 }

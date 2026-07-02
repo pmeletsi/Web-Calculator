@@ -1,16 +1,122 @@
-# React + Vite
+# Web Calculator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+PwC junior-developer training exercise — a web calculator with login, history, and full implementation discipline (multi-environment configuration, unit testing, and CI).
 
-Currently, two official plugins are available:
+- **Frontend:** React 19 + Vite + Material UI
+- **Backend:** ASP.NET Core 8 + EF Core _(in progress)_
+- **Database:** SQL Server _(in progress)_
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Authoritative documentation:  
+[PRD](_bmad-output/planning-artifacts/prd.md) · [Epics + serial roadmap](_bmad-output/planning-artifacts/epics.md) · [Decisions](docs/decisions.md)
 
-## React Compiler
+- [docs/scripted-users.md](docs/scripted-users.md) — dev credentials and how seeding works
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Prerequisites
+
+- **.NET 8 SDK**  
+  Windows: `winget install Microsoft.DotNet.SDK.8`  
+  macOS: `brew install --cask dotnet-sdk`
+
+- **Node 20+**  
+  Windows: `winget install OpenJS.NodeJS.LTS`  
+  macOS: `brew install node@20`
+
+- **SQL Server**  
+  Windows LocalDB (bundled with Visual Studio) or Docker:
+
+  ```bash
+  docker run -e "ACCEPT_EULA=Y" \
+             -e "MSSQL_SA_PASSWORD=Y0urStrong!Passw0rd" \
+             -p 1433:1433 \
+             -d --name webcalc-mssql \
+             mcr.microsoft.com/mssql/server:2022-latest
+  ```
+
+- **SonarLint** IDE plugin (Visual Studio / Rider / VS Code)
+
+---
+
+### Verify Installation
+
+- [ ] `dotnet --version` → 8.x.x
+- [ ] `node -v` → ≥ 20.0.0
+- [ ] `npm -v` → ≥ 10
+- [ ] LocalDB check:
+  ```bash
+  sqlcmd -S "(localdb)\MSSQLLocalDB" -Q "SELECT 1"
+  ```
+  → returns `1`
+- [ ] SonarLint shows issues in the IDE Problems panel
+
+---
+
+## Run
+
+### Frontend
+
+```bash
+npm install
+npm run dev
+```
+
+http://localhost:5173
+
+FE reads `VITE_API_BASE_URL` from `.env.development` (used by `npm run dev`) or `.env.production` (used by `npm run build`). Personal overrides go in `.env.local` (gitignored).
+
+---
+
+### Backend _(after Story 4.1)_
+
+```bash
+dotnet run --project backend/WebCalculator.Api
+```
+
+http://localhost:5000
+
+---
+
+## Branching
+
+Solo workflow:
+
+- Use branches from `main`:
+
+  ```
+  feature/<story-id>-<slug>
+  ```
+
+  Example:
+
+  ```
+  feature/3.1-install-mui
+  ```
+
+- Rules:
+  - One PR per story
+  - Coach review before merge
+  - Merge to `main` only
+
+No `develop`, `release`, or `hotfix` branches (see PRD §11 C7).
+
+---
+
+## Tracking
+
+Stories:  
+`_bmad-output/implementation-artifacts/`
+
+Status file:  
+`sprint-status.yaml`
+
+### Status values
+
+- `ready-for-dev` → ready to start
+- `in-progress` → active development
+- `done` → merged to `main`
+
+Pick the next task from:  
+`_bmad-output/planning-artifacts/epics.md`

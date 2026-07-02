@@ -20,6 +20,12 @@ dist-ssr
 *.suo
 *.ntvs*
 *.njsproj
-*.sln
 *.sw?
 .vs/
+
+# Backend (.NET)
+backend/**/bin/
+backend/**/obj/
+backend/**/*.user
+backend/**/appsettings.*.local.json
+backend/.vs/

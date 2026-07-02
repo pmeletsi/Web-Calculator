@@ -1,6 +1,16 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
+import {
+  Box,
+  Card,
+  TextField,
+  Button,
+  Typography,
+  Alert,
+  Stack,
+} from '@mui/material';
 import { useAuth } from '../lib/AuthContext.jsx';
 
+// TODO(6.2): replace with API call to POST /api/auth/login
 const users = [
   { username: 'evi', password: '1234' },
   { username: 'nik', password: '5678' },
@@ -14,42 +24,67 @@ const LoginPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     const found = users.find(
-      (u) => u.username === inputUser && u.password === inputPass,
+      (u) => u.username === inputUser && u.password === inputPass
     );
+
     if (found) {
       login(`local-token-${inputUser}`, inputUser);
     } else {
-      setError('Invalid credentials!');
+      setError('Invalid credentials');
     }
   };
 
   return (
-    <div style={{
-      minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-    }}>
-      <form className="login-form" onSubmit={handleSubmit} style={{
-        display: 'flex', flexDirection: 'column', alignItems: 'center',
-        gap: 16, padding: 32, background: '#fff', borderRadius: 12, boxShadow: '0 1px 10px #bfe2fade',
-      }}>
-        <h2>Login to Calculator</h2>
-        <input
-          type="text"
-          placeholder="Username"
-          value={inputUser}
-          onChange={(e) => setInputUser(e.target.value)}
-          autoFocus
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={inputPass}
-          onChange={(e) => setInputPass(e.target.value)}
-        />
-        <button className="btn control" type="submit">Login</button>
-        {error && <div style={{ color: 'red', marginTop: 8 }}>{error}</div>}
-      </form>
-    </div>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        p: 2,
+      }}
+    >
+      <Typography variant="h4" align="center" sx={{ mb: 3 }}>
+        Web Calculator
+      </Typography>
+
+      <Card sx={{ p: 4, maxWidth: 400, width: '100%' }}>
+        <Stack spacing={2} component="form" onSubmit={handleSubmit}>
+
+          <Typography variant="h6" align="center" color="text.secondary">
+            Sign in to continue
+          </Typography>
+
+          <TextField
+            label="Username"
+            autoFocus
+            required
+            fullWidth
+            value={inputUser}
+            onChange={(e) => setInputUser(e.target.value)}
+          />
+
+          <TextField
+            label="Password"
+            type="password"
+            required
+            fullWidth
+            value={inputPass}
+            onChange={(e) => setInputPass(e.target.value)}
+          />
+
+          <Button variant="contained" type="submit" fullWidth size="large">
+            Login
+          </Button>
+
+          {error && <Alert severity="error">Invalid credentials</Alert>}
+
+        </Stack>
+      </Card>
+    </Box>
   );
 };
 
