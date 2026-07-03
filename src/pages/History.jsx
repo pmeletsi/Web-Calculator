@@ -1,11 +1,14 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   AppBar, Toolbar, Typography, Button, Container, TextField, Stack,
   TableContainer, Table, TableHead, TableBody, TableRow, TableCell, TablePagination, Paper,
 } from '@mui/material';
+import { useAuth } from '../lib/AuthContext.jsx';
 
-const History = ({ history, clearHistory, onLogout }) => {
+const HistoryPage = ({ history, clearHistory }) => {
+  const { logout } = useAuth();
+
   // TODO(6.4): replace local history prop with GET /api/calculations
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -33,9 +36,9 @@ const History = ({ history, clearHistory, onLogout }) => {
     <>
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>Web Calculator — History</Typography>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>Web Calculator - History</Typography>
           <Button color="inherit" component={Link} to="/">Calculator</Button>
-          <Button color="inherit" onClick={onLogout}>Logout</Button>
+          <Button color="inherit" onClick={logout}>Logout</Button>
         </Toolbar>
       </AppBar>
 
@@ -67,9 +70,9 @@ const History = ({ history, clearHistory, onLogout }) => {
                   <TableCell colSpan={4} align="center">No calculations to show.</TableCell>
                 </TableRow>
               ) : paged.map((h, i) => (
-                <TableRow key={`${h.createdAt}-${i}`}>
+                <TableRow key={`${h.createdAt}-`}>
                   <TableCell>{fmtDate(h.createdAt)}</TableCell>
-                  <TableCell>{h.username || '—'}</TableCell>
+                  <TableCell>{h.username || '\u2014'}</TableCell>
                   <TableCell sx={{ fontFamily: 'monospace' }}>{h.expression}</TableCell>
                   <TableCell align="right">{h.result}</TableCell>
                 </TableRow>
@@ -91,4 +94,4 @@ const History = ({ history, clearHistory, onLogout }) => {
   );
 };
 
-export default History;
+export default HistoryPage;

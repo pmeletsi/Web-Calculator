@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+﻿import { useState } from 'react';
 import {
   Box,
   Card,
@@ -9,6 +8,7 @@ import {
   Alert,
   Stack,
 } from '@mui/material';
+import { useAuth } from '../lib/AuthContext.jsx';
 
 // TODO(6.2): replace with API call to POST /api/auth/login
 const users = [
@@ -16,11 +16,11 @@ const users = [
   { username: 'nik', password: '5678' },
 ];
 
-const Login = ({ onLogin }) => {
+const LoginPage = () => {
+  const { login } = useAuth();
   const [inputUser, setInputUser] = useState('');
   const [inputPass, setInputPass] = useState('');
   const [error, setError] = useState('');
-  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -30,8 +30,7 @@ const Login = ({ onLogin }) => {
     );
 
     if (found) {
-      onLogin(inputUser);
-      navigate('/', { replace: true });
+      login(`local-token-${inputUser}`, inputUser);
     } else {
       setError('Invalid credentials');
     }
@@ -81,7 +80,7 @@ const Login = ({ onLogin }) => {
             Login
           </Button>
 
-           {error && <Alert severity="error">Invalid credentials</Alert>}
+          {error && <Alert severity="error">Invalid credentials</Alert>}
 
         </Stack>
       </Card>
@@ -89,4 +88,4 @@ const Login = ({ onLogin }) => {
   );
 };
 
-export default Login;
+export default LoginPage;
