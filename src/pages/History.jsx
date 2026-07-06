@@ -4,9 +4,10 @@ import {
   AppBar, Toolbar, Typography, Button, Container, TextField, Stack,
   TableContainer, Table, TableHead, TableBody, TableRow, TableCell, TablePagination, Paper,
 } from '@mui/material';
+import { useAuth } from '../lib/AuthContext.jsx';
 
-const History = ({ history, clearHistory, onLogout }) => {
-  // TODO(6.4): replace local history prop with GET /api/calculations
+const History = ({ history, clearHistory }) => {
+  const { logout } = useAuth();
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [page, setPage] = useState(0);
@@ -17,9 +18,6 @@ const History = ({ history, clearHistory, onLogout }) => {
     const t = setTimeout(() => setDebouncedSearch(searchInput.trim().toLowerCase()), 300);
     return () => clearTimeout(t);
   }, [searchInput]);
-
-  // Reset page when search changes
-  useEffect(() => { setPage(0); }, [debouncedSearch]);
 
   const filtered = !debouncedSearch
     ? history
@@ -35,7 +33,7 @@ const History = ({ history, clearHistory, onLogout }) => {
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>Web Calculator — History</Typography>
           <Button color="inherit" component={Link} to="/">Calculator</Button>
-          <Button color="inherit" onClick={onLogout}>Logout</Button>
+          <Button color="inherit" onClick={logout}>Logout</Button>
         </Toolbar>
       </AppBar>
 
@@ -45,7 +43,10 @@ const History = ({ history, clearHistory, onLogout }) => {
             label="Search by username"
             size="small"
             value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
+            onChange={(e) => {
+              setSearchInput(e.target.value);
+              setPage(0);
+            }}
             sx={{ flexGrow: 1 }}
           />
           <Button color="warning" variant="outlined" onClick={clearHistory}>Clear</Button>
