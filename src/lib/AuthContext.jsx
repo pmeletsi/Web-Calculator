@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from './apiClient';
@@ -37,7 +36,6 @@ export function AuthProvider({ children }) {
     </AuthContext.Provider>
   );
 }
-
 
 export function useAuth() {
   const ctx = useContext(AuthContext);

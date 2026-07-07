@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   AppBar,
@@ -9,7 +9,7 @@ import {
   Grid,
   Button
 } from '@mui/material';
-
+import { useAuth } from '../lib/AuthContext.jsx';
 import { isValidExpression } from '../lib/expressionValidator';
 import { useAuth } from '../lib/AuthContext.jsx';
 
@@ -51,19 +51,19 @@ const Calculator = ({ setHistory }) => {
 
   const keys = [
     { label: 'C', onClick: handleClear, variant: 'outlined', color: 'warning' },
-    { label: '⌫', onClick: handleDelete, variant: 'outlined', color: 'warning' },
+    { label: '\u232B', onClick: handleDelete, variant: 'outlined', color: 'warning' },
     null,
-    { label: '÷', onClick: () => handleClick('/'), variant: 'outlined', color: 'secondary' },
+    { label: '\u00F7', onClick: () => handleClick('/'), variant: 'outlined', color: 'secondary' },
 
     { label: '7', onClick: () => handleClick('7'), variant: 'outlined' },
     { label: '8', onClick: () => handleClick('8'), variant: 'outlined' },
     { label: '9', onClick: () => handleClick('9'), variant: 'outlined' },
-    { label: '×', onClick: () => handleClick('*'), variant: 'outlined', color: 'secondary' },
+    { label: '\u00D7', onClick: () => handleClick('*'), variant: 'outlined', color: 'secondary' },
 
     { label: '4', onClick: () => handleClick('4'), variant: 'outlined' },
     { label: '5', onClick: () => handleClick('5'), variant: 'outlined' },
     { label: '6', onClick: () => handleClick('6'), variant: 'outlined' },
-    { label: '−', onClick: () => handleClick('-'), variant: 'outlined', color: 'secondary' },
+    { label: '\u2212', onClick: () => handleClick('-'), variant: 'outlined', color: 'secondary' },
 
     { label: '1', onClick: () => handleClick('1'), variant: 'outlined' },
     { label: '2', onClick: () => handleClick('2'), variant: 'outlined' },
@@ -73,7 +73,6 @@ const Calculator = ({ setHistory }) => {
 
   return (
     <>
-      {/*AppBar */}
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
@@ -90,10 +89,7 @@ const Calculator = ({ setHistory }) => {
         </Toolbar>
       </AppBar>
 
-      {/* Page Container */}
       <Container maxWidth="sm" sx={{ mt: 3 }}>
-
-        {/* Display */}
         <Paper
           sx={{
             p: 2,
@@ -110,7 +106,6 @@ const Calculator = ({ setHistory }) => {
           </Typography>
         </Paper>
 
-        {/* Keypad */}
         <Grid container spacing={1}>
           {keys.map((k, i) => (
             <Grid size={3} key={i}>
@@ -169,4 +164,4 @@ const Calculator = ({ setHistory }) => {
   );
 };
 
-export default Calculator;
+export default CalculatorPage;

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   AppBar, Toolbar, Typography, Button, Container, TextField, Stack,
@@ -31,7 +31,7 @@ const History = ({ history, clearHistory }) => {
     <>
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>Web Calculator — History</Typography>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>Web Calculator - History</Typography>
           <Button color="inherit" component={Link} to="/">Calculator</Button>
           <Button color="inherit" onClick={logout}>Logout</Button>
         </Toolbar>
@@ -68,9 +68,9 @@ const History = ({ history, clearHistory }) => {
                   <TableCell colSpan={4} align="center">No calculations to show.</TableCell>
                 </TableRow>
               ) : paged.map((h, i) => (
-                <TableRow key={`${h.createdAt}-${i}`}>
+                <TableRow key={`${h.createdAt}-`}>
                   <TableCell>{fmtDate(h.createdAt)}</TableCell>
-                  <TableCell>{h.username || '—'}</TableCell>
+                  <TableCell>{h.username || '\u2014'}</TableCell>
                   <TableCell sx={{ fontFamily: 'monospace' }}>{h.expression}</TableCell>
                   <TableCell align="right">{h.result}</TableCell>
                 </TableRow>
@@ -92,4 +92,4 @@ const History = ({ history, clearHistory }) => {
   );
 };
 
-export default History;
+export default HistoryPage;
