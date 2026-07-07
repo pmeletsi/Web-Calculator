@@ -11,8 +11,10 @@ import {
 } from '@mui/material';
 import { useAuth } from '../lib/AuthContext.jsx';
 import { isValidExpression } from '../lib/expressionValidator';
+import { useAuth } from '../lib/AuthContext.jsx';
 
-const CalculatorPage = ({ history, setHistory }) => {
+
+const Calculator = ({ setHistory }) => {
   const { user, logout } = useAuth();
   const [input, setInput] = useState('');
 
@@ -29,7 +31,6 @@ const CalculatorPage = ({ history, setHistory }) => {
     try {
       const expression = input;
 
-      // TODO(6.3): replace with backend POST /api/calculations
       const result = eval(expression).toString();
 
       setInput(result);

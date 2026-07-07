@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import {
   Box,
   Card,
@@ -7,32 +7,37 @@ import {
   Typography,
   Alert,
   Stack,
+  CircularProgress,
 } from '@mui/material';
+import apiClient from '../lib/apiClient';
 import { useAuth } from '../lib/AuthContext.jsx';
 
-// TODO(6.2): replace with API call to POST /api/auth/login
-const users = [
-  { username: 'evi', password: '1234' },
-  { username: 'nik', password: '5678' },
-];
-
-const LoginPage = () => {
+const Login = () => {
   const { login } = useAuth();
   const [inputUser, setInputUser] = useState('');
   const [inputPass, setInputPass] = useState('');
   const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setSubmitting(true);
 
-    const found = users.find(
-      (u) => u.username === inputUser && u.password === inputPass
-    );
-
-    if (found) {
-      login(`local-token-${inputUser}`, inputUser);
-    } else {
-      setError('Invalid credentials');
+    try {
+      const { data } = await apiClient.post('/api/auth/login', {
+        username: inputUser,
+        password: inputPass,
+      });
+      login(data.token, data.username);
+    } catch (err) {
+      if (err.response?.status === 401) {
+        setError('Invalid credentials');
+      } else {
+        setError('Could not log in. Try again.');
+      }
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -65,6 +70,7 @@ const LoginPage = () => {
             fullWidth
             value={inputUser}
             onChange={(e) => setInputUser(e.target.value)}
+            disabled={submitting}
           />
 
           <TextField
@@ -74,13 +80,14 @@ const LoginPage = () => {
             fullWidth
             value={inputPass}
             onChange={(e) => setInputPass(e.target.value)}
+            disabled={submitting}
           />
 
-          <Button variant="contained" type="submit" fullWidth size="large">
-            Login
+          <Button variant="contained" type="submit" fullWidth size="large" disabled={submitting}>
+            {submitting ? <CircularProgress size={20} color="inherit" /> : 'Login'}
           </Button>
 
-          {error && <Alert severity="error">Invalid credentials</Alert>}
+           {error && <Alert severity="error">{error}</Alert>}
 
         </Stack>
       </Card>

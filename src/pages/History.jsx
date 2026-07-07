@@ -6,10 +6,8 @@ import {
 } from '@mui/material';
 import { useAuth } from '../lib/AuthContext.jsx';
 
-const HistoryPage = ({ history, clearHistory }) => {
+const History = ({ history, clearHistory }) => {
   const { logout } = useAuth();
-
-  // TODO(6.4): replace local history prop with GET /api/calculations
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [page, setPage] = useState(0);
@@ -20,9 +18,6 @@ const HistoryPage = ({ history, clearHistory }) => {
     const t = setTimeout(() => setDebouncedSearch(searchInput.trim().toLowerCase()), 300);
     return () => clearTimeout(t);
   }, [searchInput]);
-
-  // Reset page when search changes
-  useEffect(() => { setPage(0); }, [debouncedSearch]);
 
   const filtered = !debouncedSearch
     ? history
@@ -48,7 +43,10 @@ const HistoryPage = ({ history, clearHistory }) => {
             label="Search by username"
             size="small"
             value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
+            onChange={(e) => {
+              setSearchInput(e.target.value);
+              setPage(0);
+            }}
             sx={{ flexGrow: 1 }}
           />
           <Button color="warning" variant="outlined" onClick={clearHistory}>Clear</Button>

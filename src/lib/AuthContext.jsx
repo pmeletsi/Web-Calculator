@@ -21,7 +21,7 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
-    apiClient.post('/api/auth/logout').catch(() => {});
+    apiClient.post('/api/auth/logout').catch(() => undefined);
 
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
