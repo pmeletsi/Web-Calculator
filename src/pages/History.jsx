@@ -92,4 +92,4 @@ const History = ({ history, clearHistory }) => {
   );
 };
 
-export default HistoryPage;
+export default History;
