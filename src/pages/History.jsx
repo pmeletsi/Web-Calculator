@@ -67,8 +67,8 @@ const History = ({ history, clearHistory }) => {
                 <TableRow>
                   <TableCell colSpan={4} align="center">No calculations to show.</TableCell>
                 </TableRow>
-              ) : paged.map((h, i) => (
-                <TableRow key={`${h.createdAt}-`}>
+              ) : paged.map((h) => (
+                <TableRow key={`${h.createdAt}-${h.id ?? h.expression}`}>
                   <TableCell>{fmtDate(h.createdAt)}</TableCell>
                   <TableCell>{h.username || '\u2014'}</TableCell>
                   <TableCell sx={{ fontFamily: 'monospace' }}>{h.expression}</TableCell>
