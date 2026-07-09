@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:api": "dotnet run --project backend/WebCalculator.Api/WebCalculator.Api.csproj --no-restore",
+    "dev:all": "concurrently -n FE,API -c cyan,green \"npm run dev -- --port 5173\" \"npm run dev:api\"",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -14,12 +16,12 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-"@mui/icons-material": "^7.3.11",
-"@mui/material": "^7.3.11",
-"axios": "^1.18.1",
-"react": "^19.2.5",
-"react-dom": "^19.2.5",
-"react-router-dom": "^7.15.0"
+    "@mui/icons-material": "^7.3.11",
+    "@mui/material": "^7.3.11",
+    "axios": "^1.18.1",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "react-router-dom": "^7.15.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
@@ -28,6 +30,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
+    "concurrently": "^10.0.3",
     "eslint": "^9.39.4",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
