@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:api": "dotnet run --project backend/WebCalculator.Api/WebCalculator.Api.csproj --no-restore",
+    "dev:api": "dotnet restore backend/WebCalculator.Api/WebCalculator.Api.csproj --source https://api.nuget.org/v3/index.json --ignore-failed-sources && dotnet run --project backend/WebCalculator.Api/WebCalculator.Api.csproj --no-restore",
     "dev:all": "concurrently -n FE,API -c cyan,green \"npm run dev -- --port 5173\" \"npm run dev:api\"",
     "build": "vite build",
     "lint": "eslint .",

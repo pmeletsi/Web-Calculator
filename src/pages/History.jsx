@@ -1,31 +1,80 @@
 ﻿import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  AppBar, Toolbar, Typography, Button, Container, TextField, Stack,
-  TableContainer, Table, TableHead, TableBody, TableRow, TableCell, TablePagination, Paper,
-} from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Container, TextField, Stack, Alert, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, TablePagination, Paper, Skeleton } from '@mui/material';
+import apiClient from '../lib/apiClient';
 import { useAuth } from '../lib/AuthContext.jsx';
+import ThemeToggleButton from '../components/ThemeToggleButton.jsx';
 
-const History = ({ history, clearHistory }) => {
+const fmtDate = (iso) => new Date(iso).toLocaleString();
+
+const History = () => {
   const { logout } = useAuth();
-  const [searchInput, setSearchInput] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [items, setItems] = useState([]);
+  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
+  const [searchInput, setSearchInput] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [clearing, setClearing] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  // Debounce the search input
   useEffect(() => {
-    const t = setTimeout(() => setDebouncedSearch(searchInput.trim().toLowerCase()), 300);
+    const t = setTimeout(() => {
+      setDebouncedSearch(searchInput.trim());
+      setPage(0);
+    }, 300);
     return () => clearTimeout(t);
   }, [searchInput]);
 
-  const filtered = !debouncedSearch
-    ? history
-    : history.filter((h) => (h.username || '').toLowerCase().includes(debouncedSearch));
+  useEffect(() => {
+    let cancelled = false;
 
-  const paged = filtered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+    const fetchHistory = async () => {
+      setLoading(true);
+      setError(null);
 
-  const fmtDate = (iso) => new Date(iso).toLocaleString();
+      const params = { page: page + 1, pageSize: rowsPerPage };
+      if (debouncedSearch) params.username = debouncedSearch;
+
+      try {
+        const { data } = await apiClient.get('/api/calculations', { params });
+        if (cancelled) return;
+        setItems(data.items);
+        setTotal(data.total);
+      } catch (err) {
+        if (cancelled) return;
+        if (err.response?.status === 401) return;
+        setError('Could not load history.');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    fetchHistory();
+
+    return () => { cancelled = true; };
+  }, [page, rowsPerPage, debouncedSearch, refreshKey]);
+
+  const handleClear = async () => {
+    setClearing(true);
+    setError(null);
+
+    try {
+      await apiClient.delete('/api/calculations');
+      setPage(0);
+      setSearchInput('');
+      setDebouncedSearch('');
+      setRefreshKey((prev) => prev + 1);
+    } catch (err) {
+      if (err.response?.status !== 401) {
+        setError('Could not clear history.');
+      }
+    } finally {
+      setClearing(false);
+    }
+  };
 
   return (
     <>
@@ -33,24 +82,20 @@ const History = ({ history, clearHistory }) => {
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>Web Calculator - History</Typography>
           <Button color="inherit" component={Link} to="/">Calculator</Button>
+          <ThemeToggleButton />
           <Button color="inherit" onClick={logout}>Logout</Button>
         </Toolbar>
       </AppBar>
 
       <Container maxWidth="lg" sx={{ mt: 3 }}>
-        <Stack direction="row" spacing={2} sx={{ mb: 2 }} alignItems="center">
-          <TextField
-            label="Search by username"
-            size="small"
-            value={searchInput}
-            onChange={(e) => {
-              setSearchInput(e.target.value);
-              setPage(0);
-            }}
-            sx={{ flexGrow: 1 }}
-          />
-          <Button color="warning" variant="outlined" onClick={clearHistory}>Clear</Button>
+        <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+          <TextField label="Search by username" size="small" value={searchInput} onChange={(e) => setSearchInput(e.target.value)} sx={{ flexGrow: 1 }} />
+          <Button color="warning" variant="outlined" onClick={handleClear} disabled={clearing || loading}>
+            Clear
+          </Button>
         </Stack>
+
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
         <TableContainer component={Paper}>
           <Table size="small">
@@ -63,29 +108,27 @@ const History = ({ history, clearHistory }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {paged.length === 0 ? (
+              {loading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <TableRow key={'skeleton-' + i}>
+                    <TableCell colSpan={4}><Skeleton /></TableCell>
+                  </TableRow>
+                ))
+              ) : items.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4} align="center">No calculations to show.</TableCell>
                 </TableRow>
               ) : paged.map((h) => (
                 <TableRow key={`${h.createdAt}-${h.id ?? h.expression}`}>
                   <TableCell>{fmtDate(h.createdAt)}</TableCell>
-                  <TableCell>{h.username || '\u2014'}</TableCell>
+                  <TableCell>{h.username}</TableCell>
                   <TableCell sx={{ fontFamily: 'monospace' }}>{h.expression}</TableCell>
                   <TableCell align="right">{h.result}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-          <TablePagination
-            component="div"
-            count={filtered.length}
-            page={page}
-            onPageChange={(_, p) => setPage(p)}
-            rowsPerPage={rowsPerPage}
-            onRowsPerPageChange={(e) => { setRowsPerPage(+e.target.value); setPage(0); }}
-            rowsPerPageOptions={[10, 20, 50]}
-          />
+          <TablePagination component="div" count={total} page={page} onPageChange={(_, p) => setPage(p)} rowsPerPage={rowsPerPage} onRowsPerPageChange={(e) => { setRowsPerPage(+e.target.value); setPage(0); }} rowsPerPageOptions={[10, 20, 50]} />
         </TableContainer>
       </Container>
     </>

@@ -15,9 +15,10 @@ import {
 import { useAuth } from '../lib/AuthContext.jsx';
 import { isValidExpression } from '../lib/expressionValidator';
 import apiClient from '../lib/apiClient';
+import ThemeToggleButton from '../components/ThemeToggleButton.jsx';
 
 
-const Calculator = ({ setHistory }) => {
+const Calculator = () => {
   const { logout } = useAuth();
   const [input, setInput] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -37,7 +38,6 @@ const Calculator = ({ setHistory }) => {
     try {
       const { data } = await apiClient.post('/api/calculations', { expression });
       setInput(data.result.toString());
-      setHistory((prev) => [data, ...prev]);
     } catch (err) {
       if (err.response?.status === 400) {
         const msg = err.response?.data?.message ?? 'Invalid expression';
@@ -87,6 +87,8 @@ const Calculator = ({ setHistory }) => {
           <Button color="inherit" component={Link} to="/history">
             History
           </Button>
+
+          <ThemeToggleButton />
 
           <Button color="inherit" onClick={logout}>
             Logout

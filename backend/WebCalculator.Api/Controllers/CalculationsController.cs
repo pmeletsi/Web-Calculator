@@ -53,4 +53,11 @@ public class CalculationsController : ControllerBase
         var result = await _service.GetAsync(username, page, pageSize, ct);
         return Ok(result);
     }
+
+    [HttpDelete]
+    public async Task<IActionResult> Clear(CancellationToken ct)
+    {
+        var deleted = await _service.DeleteAllAsync(ct);
+        return Ok(new { deleted });
+    }
 }
