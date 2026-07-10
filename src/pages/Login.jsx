@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import apiClient from '../lib/apiClient';
 import { useAuth } from '../lib/AuthContext.jsx';
+import ThemeToggleButton from '../components/ThemeToggleButton.jsx';
 
 const Login = () => {
   const { login } = useAuth();
@@ -52,6 +53,10 @@ const Login = () => {
         p: 2,
       }}
     >
+      <Box sx={{ position: 'absolute', top: 16, right: 16 }}>
+        <ThemeToggleButton />
+      </Box>
+
       <Typography variant="h4" align="center" sx={{ mb: 3 }}>
         Web Calculator
       </Typography>
@@ -95,4 +100,4 @@ const Login = () => {
   );
 };
 
-export default LoginPage;
+export default Login;

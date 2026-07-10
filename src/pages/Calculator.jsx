@@ -7,45 +7,50 @@ import {
   Container,
   Paper,
   Grid,
-  Button
+  Button,
+  Snackbar,
+  Alert,
+  CircularProgress,
 } from '@mui/material';
 import { useAuth } from '../lib/AuthContext.jsx';
 import { isValidExpression } from '../lib/expressionValidator';
-import { useAuth } from '../lib/AuthContext.jsx';
+import apiClient from '../lib/apiClient';
+import ThemeToggleButton from '../components/ThemeToggleButton.jsx';
 
 
-const Calculator = ({ setHistory }) => {
-  const { user, logout } = useAuth();
+const Calculator = () => {
+  const { logout } = useAuth();
   const [input, setInput] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleClick = (value) => setInput((prev) => prev + value);
   const handleClear = () => setInput('');
   const handleDelete = () => setInput((prev) => prev.slice(0, -1));
 
-  const handleCalculate = () => {
-    if (!isValidExpression(input)) {
-      setInput('Invalid');
-      return;
-    }
+  const handleCalculate = async () => {
+    if (!isValidExpression(input)) return;
+
+    setSubmitting(true);
+    setError(null);
+    const expression = input;
 
     try {
-      const expression = input;
-
-      const result = eval(expression).toString();
-
-      setInput(result);
-
-      setHistory((prev) => [
-        {
-          expression,
-          result,
-          createdAt: new Date().toISOString(),
-          username: user,
-        },
-        ...prev,
-      ]);
-    } catch {
-      setInput('Error');
+      const { data } = await apiClient.post('/api/calculations', { expression });
+      setInput(data.result.toString());
+    } catch (err) {
+      if (err.response?.status === 400) {
+        const msg = err.response?.data?.message ?? 'Invalid expression';
+        setError(msg);
+        setInput(expression);
+      } else if (err.response?.status === 401) {
+        // Axios interceptor handles cleanup and redirect.
+      } else {
+        setError('Could not calculate. Try again.');
+        setInput(expression);
+      }
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -82,6 +87,8 @@ const Calculator = ({ setHistory }) => {
           <Button color="inherit" component={Link} to="/history">
             History
           </Button>
+
+          <ThemeToggleButton />
 
           <Button color="inherit" onClick={logout}>
             Logout
@@ -151,17 +158,27 @@ const Calculator = ({ setHistory }) => {
               size="large"
               variant="contained"
               color="primary"
-              disabled={!isValidExpression(input)}
+              disabled={!isValidExpression(input) || submitting}
               onClick={handleCalculate}
             >
-              =
+              {submitting ? <CircularProgress size={20} color="inherit" /> : '='}
             </Button>
           </Grid>
         </Grid>
 
       </Container>
+      <Snackbar
+        open={!!error}
+        autoHideDuration={4000}
+        onClose={() => setError(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity="error" onClose={() => setError(null)} sx={{ width: '100%' }}>
+          {error}
+        </Alert>
+      </Snackbar>
     </>
   );
 };
 
-export default CalculatorPage;
+export default Calculator;

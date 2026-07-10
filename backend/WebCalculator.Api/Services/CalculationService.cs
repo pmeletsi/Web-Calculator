@@ -71,4 +71,9 @@ public class CalculationService
 
         return new PagedResult<CalculationResponse>(items, total);
     }
+
+    public Task<int> DeleteAllAsync(CancellationToken ct)
+    {
+        return _db.Calculations.ExecuteDeleteAsync(ct);
+    }
 }

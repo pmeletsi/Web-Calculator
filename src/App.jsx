@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/Login.jsx';
 import CalculatorPage from './pages/Calculator.jsx';
@@ -11,40 +10,13 @@ function RequireAuth({ children }) {
   return children;
 }
 
-const App = () => {
-  // TODO(6.4): replace with API-backed history hook
-  const [history, setHistory] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('calc_history') || '[]'); }
-    catch { return []; }
-  });
-  useEffect(() => {
-    try { localStorage.setItem('calc_history', JSON.stringify(history)); }
-    catch { return; }
-  }, [history]);
-  const clearHistory = () => setHistory([]);
-
-  return (
-    <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route
-        path="/"
-        element={
-          <RequireAuth>
-            <CalculatorPage setHistory={setHistory} />
-          </RequireAuth>
-        }
-      />
-      <Route
-        path="/history"
-        element={
-          <RequireAuth>
-            <HistoryPage history={history} clearHistory={clearHistory} />
-          </RequireAuth>
-        }
-      />
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
-  );
-};
+const App = () => (
+  <Routes>
+    <Route path="/login" element={<LoginPage />} />
+    <Route path="/" element={<RequireAuth><CalculatorPage /></RequireAuth>} />
+    <Route path="/history" element={<RequireAuth><HistoryPage /></RequireAuth>} />
+    <Route path="*" element={<Navigate to="/" replace />} />
+  </Routes>
+);
 
 export default App;
