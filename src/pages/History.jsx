@@ -118,8 +118,8 @@ const History = () => {
                 <TableRow>
                   <TableCell colSpan={4} align="center">No calculations to show.</TableCell>
                 </TableRow>
-              ) : items.map((h) => (
-                <TableRow key={h.id} hover>
+              ) : paged.map((h) => (
+                <TableRow key={`${h.createdAt}-${h.id ?? h.expression}`}>
                   <TableCell>{fmtDate(h.createdAt)}</TableCell>
                   <TableCell>{h.username}</TableCell>
                   <TableCell sx={{ fontFamily: 'monospace' }}>{h.expression}</TableCell>
