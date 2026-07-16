@@ -29,10 +29,18 @@ public class CalculationService
             var ncalc = new Expression(expression, ExpressionOptions.DecimalAsDefault);
             result = Convert.ToDecimal(ncalc.Evaluate());
         }
+        catch (DivideByZeroException)
+        {
+            return (ValidationResult.Fail(
+                ValidationReason.DivisionByZero,
+                "Division by Zero: Δεν επιτρέπεται η διαίρεση με το μηδέν."), null);
+        }
         catch (Exception)
         {
             // NCalc threw on something the validator missed (e.g. overflow, weird grouping).
-            return (ValidationResult.Fail(ValidationReason.BadCharacter, "Expression could not be evaluated."), null);
+            return (ValidationResult.Fail(
+                ValidationReason.BadCharacter,
+                "Syntax Error: Η εξίσωση έχει λανθασμένη μορφή."), null);
         }
 
         var calc = new Calculation
@@ -75,5 +83,14 @@ public class CalculationService
     public Task<int> DeleteAllAsync(CancellationToken ct)
     {
         return _db.Calculations.ExecuteDeleteAsync(ct);
+    }
+
+    public async Task<bool> DeleteAsync(int id, CancellationToken ct)
+    {
+        var deleted = await _db.Calculations
+            .Where(c => c.Id == id)
+            .ExecuteDeleteAsync(ct);
+
+        return deleted > 0;
     }
 }

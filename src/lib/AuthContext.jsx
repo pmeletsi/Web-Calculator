@@ -1,6 +1,5 @@
 import { createContext, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import apiClient from './apiClient';
 
 const AuthContext = createContext(null);
 
@@ -21,8 +20,6 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
-    apiClient.post('/api/auth/logout').catch(() => undefined);
-
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     setToken(null);
