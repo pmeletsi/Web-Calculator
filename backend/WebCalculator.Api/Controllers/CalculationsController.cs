@@ -60,4 +60,11 @@ public class CalculationsController : ControllerBase
         var deleted = await _service.DeleteAllAsync(ct);
         return Ok(new { deleted });
     }
+
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id, CancellationToken ct)
+    {
+        await _service.DeleteAsync(id, ct);
+        return NoContent();
+    }
 }

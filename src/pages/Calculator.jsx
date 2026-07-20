@@ -13,7 +13,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { useAuth } from '../lib/AuthContext.jsx';
-import { isValidExpression } from '../lib/expressionValidator';
+import { getExpressionError } from '../lib/expressionValidator';
 import apiClient from '../lib/apiClient';
 import ThemeToggleButton from '../components/ThemeToggleButton.jsx';
 
@@ -29,7 +29,11 @@ const Calculator = () => {
   const handleDelete = () => setInput((prev) => prev.slice(0, -1));
 
   const handleCalculate = async () => {
-    if (!isValidExpression(input)) return;
+    const validationError = getExpressionError(input);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
 
     setSubmitting(true);
     setError(null);
@@ -57,7 +61,7 @@ const Calculator = () => {
   const keys = [
     { label: 'C', onClick: handleClear, variant: 'outlined', color: 'warning' },
     { label: '\u232B', onClick: handleDelete, variant: 'outlined', color: 'warning' },
-    null,
+    { parentheses: true },
     { label: '\u00F7', onClick: () => handleClick('/'), variant: 'outlined', color: 'secondary' },
 
     { label: '7', onClick: () => handleClick('7'), variant: 'outlined' },
@@ -116,7 +120,34 @@ const Calculator = () => {
         <Grid container spacing={1}>
           {keys.map((k, i) => (
             <Grid size={3} key={i}>
-              {k && (
+              {k?.parentheses ? (
+                <Grid container spacing={0.5}>
+                  <Grid size={6}>
+                    <Button
+                      fullWidth
+                      size="small"
+                      variant="outlined"
+                      color="secondary"
+                      onClick={() => handleClick('(')}
+                      sx={{ minWidth: 0, py: 1 }}
+                    >
+                      (
+                    </Button>
+                  </Grid>
+                  <Grid size={6}>
+                    <Button
+                      fullWidth
+                      size="small"
+                      variant="outlined"
+                      color="secondary"
+                      onClick={() => handleClick(')')}
+                      sx={{ minWidth: 0, py: 1 }}
+                    >
+                      )
+                    </Button>
+                  </Grid>
+                </Grid>
+              ) : k && (
                 <Button
                   fullWidth
                   size="large"
@@ -158,7 +189,7 @@ const Calculator = () => {
               size="large"
               variant="contained"
               color="primary"
-              disabled={!isValidExpression(input) || submitting}
+              disabled={!input.trim() || submitting}
               onClick={handleCalculate}
             >
               {submitting ? <CircularProgress size={20} color="inherit" /> : '='}

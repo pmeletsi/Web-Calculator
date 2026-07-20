@@ -1,6 +1,7 @@
 ﻿import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AppBar, Toolbar, Typography, Button, Container, TextField, Stack, Alert, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, TablePagination, Paper, Skeleton } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Container, TextField, Stack, Alert, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, TablePagination, Paper, Skeleton, IconButton, Tooltip } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 import apiClient from '../lib/apiClient';
 import { useAuth } from '../lib/AuthContext.jsx';
 import ThemeToggleButton from '../components/ThemeToggleButton.jsx';
@@ -18,6 +19,7 @@ const History = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [clearing, setClearing] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
@@ -56,6 +58,27 @@ const History = () => {
 
     return () => { cancelled = true; };
   }, [page, rowsPerPage, debouncedSearch, refreshKey]);
+
+  const handleDelete = async (id) => {
+    setDeletingId(id);
+    setError(null);
+
+    try {
+      await apiClient.delete(`/api/calculations/${id}`);
+
+      if (items.length === 1 && page > 0) {
+        setPage((current) => current - 1);
+      } else {
+        setRefreshKey((prev) => prev + 1);
+      }
+    } catch (err) {
+      if (err.response?.status !== 401) {
+        setError('Could not delete calculation.');
+      }
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   const handleClear = async () => {
     setClearing(true);
@@ -105,25 +128,40 @@ const History = () => {
                 <TableCell>Username</TableCell>
                 <TableCell>Expression</TableCell>
                 <TableCell align="right">Result</TableCell>
+                <TableCell align="center">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {loading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <TableRow key={'skeleton-' + i}>
-                    <TableCell colSpan={4}><Skeleton /></TableCell>
+                    <TableCell colSpan={5}><Skeleton /></TableCell>
                   </TableRow>
                 ))
               ) : items.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} align="center">No calculations to show.</TableCell>
+                  <TableCell colSpan={5} align="center">No calculations to show.</TableCell>
                 </TableRow>
-              ) : paged.map((h) => (
+              ) : items.map((h) => (
                 <TableRow key={`${h.createdAt}-${h.id ?? h.expression}`}>
                   <TableCell>{fmtDate(h.createdAt)}</TableCell>
                   <TableCell>{h.username}</TableCell>
                   <TableCell sx={{ fontFamily: 'monospace' }}>{h.expression}</TableCell>
                   <TableCell align="right">{h.result}</TableCell>
+                  <TableCell align="center">
+                    <Tooltip title="Delete">
+                      <span>
+                        <IconButton
+                          color="error"
+                          aria-label="Delete calculation"
+                          disabled={deletingId === h.id}
+                          onClick={() => handleDelete(h.id)}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </span>
+                    </Tooltip>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
