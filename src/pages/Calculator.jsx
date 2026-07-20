@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   AppBar,
@@ -21,12 +21,62 @@ import ThemeToggleButton from '../components/ThemeToggleButton.jsx';
 const Calculator = () => {
   const { logout } = useAuth();
   const [input, setInput] = useState('');
+  const [result, setResult] = useState('0');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [justCalculated, setJustCalculated] = useState(false);
 
-  const handleClick = (value) => setInput((prev) => prev + value);
-  const handleClear = () => setInput('');
-  const handleDelete = () => setInput((prev) => prev.slice(0, -1));
+  useEffect(() => {
+    if (getExpressionError(input)) return undefined;
+
+    const controller = new AbortController();
+    const timeout = setTimeout(async () => {
+      try {
+        const { data } = await apiClient.post(
+          '/api/calculations/preview',
+          { expression: input },
+          { signal: controller.signal },
+        );
+        setResult(data.result.toString());
+      } catch (err) {
+        if (err.code !== 'ERR_CANCELED' && err.response?.status !== 400 && err.response?.status !== 401) {
+          setResult('0');
+        }
+      }
+    }, 300);
+
+    return () => {
+      clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [input]);
+
+  const handleClick = (value) => {
+    const isOperator = /^[+\-*/]$/.test(value);
+    const nextInput = justCalculated
+      ? (isOperator ? result + value : value)
+      : input + value;
+
+    setInput(nextInput);
+    setJustCalculated(false);
+
+    if (justCalculated && !isOperator) {
+      setResult('0');
+    } else if (!justCalculated && getExpressionError(nextInput)) {
+      setResult('0');
+    }
+  };
+  const handleClear = () => {
+    setInput('');
+    setResult('0');
+    setJustCalculated(false);
+  };
+  const handleDelete = () => {
+    const nextInput = justCalculated ? '' : input.slice(0, -1);
+    setInput(nextInput);
+    setJustCalculated(false);
+    if (getExpressionError(nextInput)) setResult('0');
+  };
 
   const handleCalculate = async () => {
     const validationError = getExpressionError(input);
@@ -41,7 +91,8 @@ const Calculator = () => {
 
     try {
       const { data } = await apiClient.post('/api/calculations', { expression });
-      setInput(data.result.toString());
+      setResult(data.result.toString());
+      setJustCalculated(true);
     } catch (err) {
       if (err.response?.status === 400) {
         const msg = err.response?.data?.message ?? 'Invalid expression';
@@ -108,12 +159,21 @@ const Calculator = () => {
             textAlign: 'right',
             minHeight: 80,
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-end'
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+            justifyContent: 'center',
+            overflow: 'hidden',
           }}
         >
-          <Typography variant="h4">
-            {input || '0'}
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ width: '100%', minHeight: 20, overflowWrap: 'anywhere' }}
+          >
+            {input || '\u00A0'}
+          </Typography>
+          <Typography variant="h4" sx={{ width: '100%', overflowWrap: 'anywhere' }}>
+            {result}
           </Typography>
         </Paper>
 
