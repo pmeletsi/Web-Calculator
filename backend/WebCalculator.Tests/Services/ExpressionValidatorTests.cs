@@ -18,6 +18,7 @@ public class ExpressionValidatorTests
     [DataRow("0.1+0.2")]
     [DataRow("(1+2)*3")]
     [DataRow("7*(8-3)")]
+    [DataRow("((((1))))")]
     [DataRow("  3 + 4  ")]
     public void Accepts_valid_expressions(string expr)
         => Assert.IsTrue(_v.Validate(expr).IsValid);
