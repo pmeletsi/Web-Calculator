@@ -19,21 +19,10 @@ public class CalculationService
     public async Task<(ValidationResult validation, CalculationResponse? result)> CalculateAsync(
         string expression, int userId, string username, CancellationToken ct)
     {
-        var validation = _validator.Validate(expression);
-        if (!validation.IsValid) return (validation, null);
+        var (validation, previewResult) = Preview(expression);
+        if (!validation.IsValid || previewResult is null) return (validation, null);
 
-        decimal result;
-        try
-        {
-            // DecimalAsDefault → "7/2" evaluates to 3.5m, not int 3.
-            var ncalc = new Expression(expression, ExpressionOptions.DecimalAsDefault);
-            result = Convert.ToDecimal(ncalc.Evaluate());
-        }
-        catch (Exception)
-        {
-            // NCalc threw on something the validator missed (e.g. overflow, weird grouping).
-            return (ValidationResult.Fail(ValidationReason.BadCharacter, "Expression could not be evaluated."), null);
-        }
+        var result = previewResult.Value;
 
         var calc = new Calculation
         {
@@ -47,6 +36,30 @@ public class CalculationService
         await _db.SaveChangesAsync(ct);
 
         return (validation, new CalculationResponse(calc.Id, calc.Expression, calc.Result, calc.CreatedAt, calc.Username));
+    }
+
+    public (ValidationResult validation, decimal? result) Preview(string expression)
+    {
+        var validation = _validator.Validate(expression);
+        if (!validation.IsValid) return (validation, null);
+
+        try
+        {
+            var ncalc = new Expression(expression, ExpressionOptions.DecimalAsDefault);
+            return (validation, Convert.ToDecimal(ncalc.Evaluate()));
+        }
+        catch (DivideByZeroException)
+        {
+            return (ValidationResult.Fail(
+                ValidationReason.DivisionByZero,
+                "Division by Zero: Δεν επιτρέπεται η διαίρεση με το μηδέν."), null);
+        }
+        catch (Exception)
+        {
+            return (ValidationResult.Fail(
+                ValidationReason.BadCharacter,
+                "Syntax Error: Η εξίσωση έχει λανθασμένη μορφή."), null);
+        }
     }
 
     public async Task<PagedResult<CalculationResponse>> GetAsync(
@@ -75,5 +88,14 @@ public class CalculationService
     public Task<int> DeleteAllAsync(CancellationToken ct)
     {
         return _db.Calculations.ExecuteDeleteAsync(ct);
+    }
+
+    public async Task<bool> DeleteAsync(int id, CancellationToken ct)
+    {
+        var deleted = await _db.Calculations
+            .Where(c => c.Id == id)
+            .ExecuteDeleteAsync(ct);
+
+        return deleted > 0;
     }
 }

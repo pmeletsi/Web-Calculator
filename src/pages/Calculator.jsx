@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   AppBar,
@@ -13,7 +13,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { useAuth } from '../lib/AuthContext.jsx';
-import { isValidExpression } from '../lib/expressionValidator';
+import { getExpressionError } from '../lib/expressionValidator';
 import apiClient from '../lib/apiClient';
 import ThemeToggleButton from '../components/ThemeToggleButton.jsx';
 
@@ -21,15 +21,69 @@ import ThemeToggleButton from '../components/ThemeToggleButton.jsx';
 const Calculator = () => {
   const { logout } = useAuth();
   const [input, setInput] = useState('');
+  const [result, setResult] = useState('0');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [justCalculated, setJustCalculated] = useState(false);
 
-  const handleClick = (value) => setInput((prev) => prev + value);
-  const handleClear = () => setInput('');
-  const handleDelete = () => setInput((prev) => prev.slice(0, -1));
+  useEffect(() => {
+    if (getExpressionError(input)) return undefined;
+
+    const controller = new AbortController();
+    const timeout = setTimeout(async () => {
+      try {
+        const { data } = await apiClient.post(
+          '/api/calculations/preview',
+          { expression: input },
+          { signal: controller.signal },
+        );
+        setResult(data.result.toString());
+      } catch (err) {
+        if (err.code !== 'ERR_CANCELED' && err.response?.status !== 400 && err.response?.status !== 401) {
+          setResult('0');
+        }
+      }
+    }, 300);
+
+    return () => {
+      clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [input]);
+
+  const handleClick = (value) => {
+    const isOperator = /^[+\-*/]$/.test(value);
+    const nextInput = justCalculated
+      ? (isOperator ? result + value : value)
+      : input + value;
+
+    setInput(nextInput);
+    setJustCalculated(false);
+
+    if (justCalculated && !isOperator) {
+      setResult('0');
+    } else if (!justCalculated && getExpressionError(nextInput)) {
+      setResult('0');
+    }
+  };
+  const handleClear = () => {
+    setInput('');
+    setResult('0');
+    setJustCalculated(false);
+  };
+  const handleDelete = () => {
+    const nextInput = justCalculated ? '' : input.slice(0, -1);
+    setInput(nextInput);
+    setJustCalculated(false);
+    if (getExpressionError(nextInput)) setResult('0');
+  };
 
   const handleCalculate = async () => {
-    if (!isValidExpression(input)) return;
+    const validationError = getExpressionError(input);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
 
     setSubmitting(true);
     setError(null);
@@ -37,7 +91,8 @@ const Calculator = () => {
 
     try {
       const { data } = await apiClient.post('/api/calculations', { expression });
-      setInput(data.result.toString());
+      setResult(data.result.toString());
+      setJustCalculated(true);
     } catch (err) {
       if (err.response?.status === 400) {
         const msg = err.response?.data?.message ?? 'Invalid expression';
@@ -57,7 +112,7 @@ const Calculator = () => {
   const keys = [
     { label: 'C', onClick: handleClear, variant: 'outlined', color: 'warning' },
     { label: '\u232B', onClick: handleDelete, variant: 'outlined', color: 'warning' },
-    null,
+    { parentheses: true },
     { label: '\u00F7', onClick: () => handleClick('/'), variant: 'outlined', color: 'secondary' },
 
     { label: '7', onClick: () => handleClick('7'), variant: 'outlined' },
@@ -104,19 +159,55 @@ const Calculator = () => {
             textAlign: 'right',
             minHeight: 80,
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-end'
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+            justifyContent: 'center',
+            overflow: 'hidden',
           }}
         >
-          <Typography variant="h4">
-            {input || '0'}
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ width: '100%', minHeight: 20, overflowWrap: 'anywhere' }}
+          >
+            {input || '\u00A0'}
+          </Typography>
+          <Typography variant="h4" sx={{ width: '100%', overflowWrap: 'anywhere' }}>
+            {result}
           </Typography>
         </Paper>
 
         <Grid container spacing={1}>
           {keys.map((k, i) => (
             <Grid size={3} key={i}>
-              {k && (
+              {k?.parentheses ? (
+                <Grid container spacing={0.5}>
+                  <Grid size={6}>
+                    <Button
+                      fullWidth
+                      size="small"
+                      variant="outlined"
+                      color="secondary"
+                      onClick={() => handleClick('(')}
+                      sx={{ minWidth: 0, py: 1 }}
+                    >
+                      (
+                    </Button>
+                  </Grid>
+                  <Grid size={6}>
+                    <Button
+                      fullWidth
+                      size="small"
+                      variant="outlined"
+                      color="secondary"
+                      onClick={() => handleClick(')')}
+                      sx={{ minWidth: 0, py: 1 }}
+                    >
+                      )
+                    </Button>
+                  </Grid>
+                </Grid>
+              ) : k && (
                 <Button
                   fullWidth
                   size="large"
@@ -158,7 +249,7 @@ const Calculator = () => {
               size="large"
               variant="contained"
               color="primary"
-              disabled={!isValidExpression(input) || submitting}
+              disabled={!input.trim() || submitting}
               onClick={handleCalculate}
             >
               {submitting ? <CircularProgress size={20} color="inherit" /> : '='}

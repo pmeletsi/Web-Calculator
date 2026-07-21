@@ -40,6 +40,19 @@ public class CalculationsController : ControllerBase
         return Ok(result);
     }
 
+    [HttpPost("preview")]
+    public IActionResult Preview([FromBody] CalculationRequest request)
+    {
+        var (validation, result) = _service.Preview(request.Expression);
+
+        if (!validation.IsValid)
+        {
+            return BadRequest(new { reason = validation.Reason.ToString(), message = validation.Message });
+        }
+
+        return Ok(new { result });
+    }
+
     [HttpGet]
     public async Task<IActionResult> List(
         [FromQuery] string? username,
@@ -59,5 +72,12 @@ public class CalculationsController : ControllerBase
     {
         var deleted = await _service.DeleteAllAsync(ct);
         return Ok(new { deleted });
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id, CancellationToken ct)
+    {
+        await _service.DeleteAsync(id, ct);
+        return NoContent();
     }
 }
