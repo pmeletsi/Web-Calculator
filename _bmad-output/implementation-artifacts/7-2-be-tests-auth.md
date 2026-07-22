@@ -21,13 +21,13 @@ so that **regressions in the login flow are caught locally and the brief's "deco
 
 ## Tasks / Subtasks
 
-- [ ] **Task 1 — Extend the existing test class** (AC: 1, 2, 3)
-  - [ ] Open `backend/WebCalculator.Tests/Services/AuthServiceTests.cs` (from Story 5.2).
-  - [ ] Add the new test methods per **Dev Notes → New tests**.
+- [x] **Task 1 — Extend the existing test class** (AC: 1, 2, 3)
+  - [x] Open `backend/WebCalculator.Tests/Services/AuthServiceTests.cs` (from Story 5.2).
+  - [x] Add the new test methods per **Dev Notes → New tests**.
 
-- [ ] **Task 2 — Verify** (AC: 4)
-  - [ ] `dotnet test backend/WebCalculator.sln` → all green.
-  - [ ] Filter to just this class: `dotnet test --filter "FullyQualifiedName~AuthServiceTests"` → ≥ 6 tests reported.
+- [x] **Task 2 — Verify** (AC: 4)
+  - [x] `dotnet test backend/WebCalculator.sln` → all green.
+  - [x] Filter to just this class: `dotnet test --filter "FullyQualifiedName~AuthServiceTests"` → ≥ 6 tests reported.
 
 - [ ] **Task 3 — Open the PR**
   - [ ] Branch: `feature/7.2-be-tests-auth`
@@ -150,8 +150,22 @@ The "wrong password" test from Story 5.2 covers the case where the user provides
 
 ### Agent Model Used
 
+GitHub Copilot
+
 ### Debug Log References
+
+- `dotnet test backend/WebCalculator.sln`: 50 passed, 0 failed.
+- `dotnet test backend/WebCalculator.sln --filter "FullyQualifiedName~AuthServiceTests"`: 9 passed, 0 failed.
 
 ### Completion Notes List
 
+- Extended the existing MSTest class with JWT claim, token lifetime, empty credential, and BCrypt stored-hash mismatch coverage.
+- Corrected JWT issuance so `sub` contains the username and `uid` contains the user ID, matching the acceptance criteria.
+- Completed Tasks 1–2 only; Task 3 remains open by request.
+
 ### File List
+
+- `backend/WebCalculator.Api/Services/AuthService.cs`
+- `backend/WebCalculator.Tests/Services/AuthServiceTests.cs`
+- `_bmad-output/implementation-artifacts/7-2-be-tests-auth.md`
+- `_bmad-output/implementation-artifacts/sprint-status.yaml`

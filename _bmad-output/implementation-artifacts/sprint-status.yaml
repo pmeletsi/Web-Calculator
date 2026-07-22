@@ -65,7 +65,7 @@ development_status:
   # ===== Epic 7 — Quality & Tests =====
   epic-7: in-progress
   7-1-be-tests-validator: in-progress
-  7-2-be-tests-auth: ready-for-dev
+  7-2-be-tests-auth: in-progress
   7-3-fe-tests-vitest: ready-for-dev
   7-4-sonarlint-clean: ready-for-dev
 
