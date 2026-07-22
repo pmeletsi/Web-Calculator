@@ -1,6 +1,6 @@
 # Story 7.1: Backend unit tests — `ExpressionValidator` (extend) + `CalculationService`
 
-Status: ready-for-dev
+Status: in-progress
 
 ## Story
 
@@ -24,16 +24,16 @@ so that **regressions are caught locally and in CI (Story 8.1) — and the brief
 
 ## Tasks / Subtasks
 
-- [ ] **Task 1 — (Optional) Review & extend the validator tests** (AC: 1)
-  - [ ] Open `backend/WebCalculator.Tests/Services/ExpressionValidatorTests.cs` (from Story 5.1).
-  - [ ] If you find a regression-worthy case missing (e.g., 1000-char expression, `((((1))))`), add a single `[InlineData]` row.
-  - [ ] **Do not refactor working tests** — read-only PR is fine.
+- [x] **Task 1 — (Optional) Review & extend the validator tests** (AC: 1)
+  - [x] Open `backend/WebCalculator.Tests/Services/ExpressionValidatorTests.cs` (from Story 5.1).
+  - [x] If you find a regression-worthy case missing (e.g., 1000-char expression, `((((1))))`), add a single `[InlineData]` row.
+  - [x] **Do not refactor working tests** — read-only PR is fine.
 
-- [ ] **Task 2 — Create the calculation service test class** (AC: 2, 3, 4)
-  - [ ] `backend/WebCalculator.Tests/Services/CalculationServiceTests.cs` per **Dev Notes → Test class content**.
+- [x] **Task 2 — Create the calculation service test class** (AC: 2, 3, 4)
+  - [x] `backend/WebCalculator.Tests/Services/CalculationServiceTests.cs` per **Dev Notes → Test class content**.
 
-- [ ] **Task 3 — Run + verify** (AC: 5)
-  - [ ] `dotnet test backend/WebCalculator.sln` → all green.
+- [x] **Task 3 — Run + verify** (AC: 5)
+  - [x] `dotnet test backend/WebCalculator.sln` → all green.
   - [ ] Optional: `dotnet test --collect:"XPlat Code Coverage"` then open the coverage report in `TestResults/`.
   - [ ] Eyeball coverage of `CalculationService` and `ExpressionValidator` — should be ≥ 90% (epic AC target).
 
@@ -248,8 +248,25 @@ The HTML report lands in `TestResults/<guid>/coverage.cobertura.xml`. View with 
 
 ### Agent Model Used
 
+GitHub Copilot
+
 ### Debug Log References
+
+- `dotnet test backend/WebCalculator.Tests/WebCalculator.Tests.csproj --no-restore -c Release --filter FullyQualifiedName~ExpressionValidatorTests` — 23 passed.
+- `dotnet test backend/WebCalculator.Tests/WebCalculator.Tests.csproj --no-restore -c Release --filter FullyQualifiedName~CalculationServiceTests` — 9 passed.
+- `dotnet test backend/WebCalculator.sln --no-restore -c Release` — 36 passed, 0 failed, 0 skipped.
+- Release configuration was used because a running Debug API process locked `WebCalculator.Api.exe`.
 
 ### Completion Notes List
 
+- Extended the existing MSTest validator suite with a deeply nested balanced-parentheses case without refactoring working tests.
+- Added isolated EF Core InMemory CalculationService tests covering persistence fields, validation failures with no writes, decimal division, ordering, username filtering, and exact page-two pagination.
+- Confirmed the complete backend solution test suite exceeds the required passing-test threshold.
+- The optional coverage collector command was not run; no numeric coverage claim is recorded.
+
 ### File List
+
+- backend/WebCalculator.Tests/Services/ExpressionValidatorTests.cs
+- backend/WebCalculator.Tests/Services/CalculationServiceTests.cs
+- _bmad-output/implementation-artifacts/7-1-be-tests-validator.md
+- _bmad-output/implementation-artifacts/sprint-status.yaml
