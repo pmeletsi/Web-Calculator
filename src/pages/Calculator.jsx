@@ -249,7 +249,7 @@ const Calculator = () => {
               size="large"
               variant="contained"
               color="primary"
-              disabled={!input.trim() || submitting}
+              disabled={!!getExpressionError(input) || submitting}
               onClick={handleCalculate}
             >
               {submitting ? <CircularProgress size={20} color="inherit" /> : '='}
