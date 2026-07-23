@@ -81,4 +81,63 @@ public class AuthServiceTests
 
         Assert.IsNull(result);
     }
+
+    [TestMethod]
+    public async Task LoginAsync_ValidCredentials_TokenContainsExpectedClaims()
+    {
+        using var db = CreateDb();
+        var service = new AuthService(db, CreateConfig());
+
+        var result = await service.LoginAsync(new LoginRequest("evi", ValidPassword));
+
+        Assert.IsNotNull(result);
+        var token = new JwtSecurityTokenHandler().ReadJwtToken(result!.Token);
+        Assert.AreEqual("evi", token.Claims.First(c => c.Type == JwtRegisteredClaimNames.Sub).Value);
+        Assert.AreEqual("1", token.Claims.First(c => c.Type == "uid").Value);
+        Assert.IsFalse(string.IsNullOrEmpty(
+            token.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Jti)?.Value));
+    }
+
+    [TestMethod]
+    public async Task LoginAsync_ValidCredentials_TokenExpiresWithinConfiguredLifetime()
+    {
+        using var db = CreateDb();
+        var service = new AuthService(db, CreateConfig());
+
+        var result = await service.LoginAsync(new LoginRequest("evi", ValidPassword));
+
+        Assert.IsNotNull(result);
+        var now = DateTime.UtcNow;
+        var token = new JwtSecurityTokenHandler().ReadJwtToken(result!.Token);
+        Assert.IsTrue(token.ValidTo > now);
+        Assert.IsTrue(token.ValidTo < now.AddMinutes(61));
+    }
+
+    [DataTestMethod]
+    [DataRow("", ValidPassword)]
+    [DataRow("evi", "")]
+    [DataRow("", "")]
+    public async Task LoginAsync_EmptyCredentials_ReturnsNull(string username, string password)
+    {
+        using var db = CreateDb();
+        var service = new AuthService(db, CreateConfig());
+
+        var result = await service.LoginAsync(new LoginRequest(username, password));
+
+        Assert.IsNull(result);
+    }
+
+    [TestMethod]
+    public async Task LoginAsync_StoredHashForDifferentPassword_ReturnsNull()
+    {
+        using var db = CreateDb();
+        var user = await db.Users.SingleAsync(u => u.Username == "evi");
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword("a-different-password");
+        await db.SaveChangesAsync();
+        var service = new AuthService(db, CreateConfig());
+
+        var result = await service.LoginAsync(new LoginRequest("evi", ValidPassword));
+
+        Assert.IsNull(result);
+    }
 }
