@@ -54,7 +54,7 @@ public class CalculationService
                 ValidationReason.DivisionByZero,
                 "Division by Zero: Δεν επιτρέπεται η διαίρεση με το μηδέν."), null);
         }
-        catch (Exception)
+        catch (Exception) // nosonar — Defence in depth: NCalc may throw for overflow or expression shapes missed by validation; return a controlled client error instead of leaking a server error.
         {
             return (ValidationResult.Fail(
                 ValidationReason.BadCharacter,
