@@ -12,6 +12,9 @@ public class User
     [Required, MaxLength(256)]
     public string PasswordHash { get; set; } = "";
 
+    [Required, MaxLength(20)]
+    public string Role { get; set; } = "User";
+
     public DateTime CreatedAt { get; set; }
 
     // Navigation
