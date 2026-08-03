@@ -10,16 +10,17 @@
 #
 # Epic statuses follow the same lifecycle.
 #
-# Total: 8 active epics, 29 stories.
+# Total: 9 active epics, 37 stories.
 # Story IDs are in serial pickup order — read the entries top-to-bottom for the order Evi works.
 # Epic 2 (separate ER/Wireframe documents) was dropped per PRD §11 C7;
 # diagrams now live inline in their owning stories (ERD in 4.3; wireframes in 3.4/3.5/3.6).
 # Epic 8 was trimmed to a single combined CI workflow story (BE + FE in one branch).
+# Epic 10 (Admin Role) is a post-PRD addition — see epics.md for rationale.
 
-last_updated: 2026-05-06
+last_updated: 2026-07-29
 project: Web Calculator
-total_epics: 8
-total_stories: 29
+total_epics: 9
+total_stories: 37
 
 development_status:
   # ===== Epic 1 — Foundation (cleanup + README) =====
@@ -77,3 +78,14 @@ development_status:
   epic-9: in-progress
   9-1-ai-rebuild: ready-for-dev
   9-2-ai-reflection: ready-for-dev
+
+  # ===== Epic 10 — Admin Role & Management (post-PRD addition) =====
+  epic-10: ready-for-dev
+  10-1-user-role-migration: ready-for-dev
+  10-2-jwt-role-authorization: ready-for-dev
+  10-3-admin-users-crud: ready-for-dev
+  10-4-admin-calculations-history: ready-for-dev
+  10-5-admin-route-guard-nav: ready-for-dev
+  10-6-admin-users-page: ready-for-dev
+  10-7-admin-history-page: ready-for-dev
+  10-8-admin-tests: ready-for-dev

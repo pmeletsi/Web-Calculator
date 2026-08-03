@@ -17,9 +17,11 @@ techStack:
 # Product Requirements Document — Web Calculator
 
 **Author:** Evi
-**Date:** 2026-05-06
-**Status:** Draft v2 (brownfield-aware)
+**Date:** 2026-05-06 (last amended 2026-07-29)
+**Status:** Draft v3 (brownfield-aware; Admin role added post-PRD)
 **Source spec:** [docs/web-calculator-training.md](../../docs/web-calculator-training.md)
+
+> **Amendment 2026-07-29:** An **Admin role** was requested after the initial PRD was drafted. It is scoped in this document (see §2 G7, §3, §4, §5 FR7-FR9, §8, §9, §11 C2/C3) and delivered by **Epic 10** in `epics.md`. This supersedes the original §11 C2 ("no admin UI") — see the updated constraint below.
 
 ---
 
@@ -75,12 +77,14 @@ The repository already contains a partial frontend that Evi has built. We are **
 | G4 | The trainee practices a professional workflow                         | Branch + PR per story file; commits carry story IDs; SonarLint clean; multi-env config without code changes                |
 | G5 | The build is reproducible and automated                               | CI pipeline compiles, tests, and packages both apps on every PR to `main` (no `develop` per §11 C7)                        |
 | G6 | Phase 4 AI re-implementation is delivered in a separate repo          | New repo contains a Copilot-assisted rebuild plus a short reflection                                                       |
+| G7 | An Admin can manage accounts and audit all usage without DB access     | Admin can create/delete user accounts and view any/all users' calculation history entirely through the UI (Epic 10)        |
 
 ---
 
 ## 3. Personas
 
-- **End user (authorized scripted user)** — signs in with credentials seeded into the database, performs calculations, browses history. Does not manage their own account.
+- **End user (authorized scripted user, `User` role)** — signs in with credentials seeded into the database, performs calculations, browses their own history. Does not manage their own account.
+- **Admin (authorized scripted user, `Admin` role)** — signs in the same way as an end user but additionally can create and delete user accounts, and can view any/all users' calculation history. Added post-PRD (see amendment note above); delivered by Epic 10.
 - **Trainee developer (Evi / new teammate)** — owns implementation; needs the work broken into discrete stories to pick up one at a time.
 - **Coach engineer** — reviews PRs, mentors on best practices, signs off phases.
 
@@ -98,12 +102,14 @@ The repository already contains a partial frontend that Evi has built. We are **
 - CI pipeline (compile, build, package, unit tests)
 - ER-Diagram (inline in Story 4.3), Wireframes (inline in Stories 3.4 / 3.5 / 3.6), and project documentation in `README.md` + `docs/decisions.md` (replaces the brief's separate Wiki — see §11 C7)
 - AI-assisted re-implementation in a new repo (Phase 4)
+- **Admin role** (post-PRD addition, Epic 10): create/delete user accounts and view any/all users' calculation history, entirely through the UI — see FR7-FR9
 
 ### Out of scope (explicit)
-- User management UI — users are seeded via SQL script ("scripted users")
+- Self-service account management for end users (sign-up, password reset, profile edit) — accounts are still only created by an Admin or seeded via SQL script; there is no public registration flow
 - Azure PaaS deployment — marked Not Applicable in the brief
 - Advanced operators (`%`, `√`, exponents, scientific functions, memory)
-- Per-user history isolation — the brief says "search by user", implying cross-user visibility
+- Per-user history isolation for regular users — the brief says "search by user", implying cross-user visibility; Admins can additionally see every user's history (FR9)
+- Fine-grained permissions / multiple roles beyond `User` and `Admin`
 - Internationalization, dark mode, mobile-native apps
 - Real-time / multi-user collaboration
 
@@ -119,6 +125,9 @@ The repository already contains a partial frontend that Evi has built. We are **
 | FR4 | History page lists previous calculations and supports **search by username**                                      | Brief §FR2    |
 | FR5 | Server-side validation rejects expressions that would error (bad chars, division-by-zero, unbalanced parens, empty input) | Brief §FR5    |
 | FR6 | Authenticated user can log out, clearing their session                                                            | Brief §FR6    |
+| FR7 | An Admin can create a new user account (username, password, role) and delete an existing one, through the UI      | Post-PRD addition (Epic 10) |
+| FR8 | A non-admin user's history view/search is always scoped to their own username, regardless of query parameters passed | Post-PRD addition (Epic 10) — also closes a latent cross-user data leak in FR4's original implementation |
+| FR9 | An Admin can view calculation history for any single user or across all users, through the same History-style UI   | Post-PRD addition (Epic 10) |
 
 ---
 
@@ -162,6 +171,7 @@ The repository already contains a partial frontend that Evi has built. We are **
 | Id            | INT IDENTITY PK       |                                                |
 | Username      | NVARCHAR(50) UNIQUE NOT NULL |                                         |
 | PasswordHash  | NVARCHAR(256) NOT NULL | BCrypt or PBKDF2; never plaintext             |
+| Role          | NVARCHAR(20) NOT NULL | `"User"` or `"Admin"`; default `"User"`. Added post-PRD (Story 10.1) |
 | CreatedAt     | DATETIME2 NOT NULL    | Default `SYSUTCDATETIME()`                     |
 
 ### `Calculations`
@@ -181,13 +191,16 @@ Indexes: `IX_Calculations_Username` for the History search filter.
 ## 9. API Surface
 
 | Method | Path                                            | Auth   | Body                       | Response                                                  |
-|--------|-------------------------------------------------|--------|----------------------------|-----------------------------------------------------------|
+|--------|--------------------------------------------------|--------|----------------------------|---------------------------------------------------------------|
 | POST   | `/api/auth/login`                               | none   | `{ username, password }`   | `200 { token, username }` / `401`                         |
 | POST   | `/api/auth/logout`                              | bearer | —                          | `204` (no-op for stateless JWT; client clears token)      |
 | POST   | `/api/calculations`                             | bearer | `{ expression }`           | `200 { id, expression, result, createdAt, username }` / `400` |
-| GET    | `/api/calculations?username=&page=&pageSize=`   | bearer | —                          | `200 { items, total }`                                    |
+| GET    | `/api/calculations?username=&page=&pageSize=`   | bearer | —                          | `200 { items, total }` — non-admins: `username` filter ignored, always scoped to caller (FR8); Admins: any/all users (FR9) |
+| GET    | `/api/admin/users`                              | bearer, Admin | —                   | `200 [{ id, username, role, createdAt }]`                  |
+| POST   | `/api/admin/users`                              | bearer, Admin | `{ username, password, role }` | `201 { id, username, role, createdAt }` / `400` / `409` |
+| DELETE | `/api/admin/users/{id}`                         | bearer, Admin | —                   | `204` / `404` / `409` (has history) / `400` (self-delete)  |
 
-Username is always read from the JWT `sub` claim, never from the request body.
+Username is always read from the JWT `sub` claim, never from the request body. The JWT also carries a `role` claim (`User`/`Admin`), added post-PRD by Story 10.2; `/api/admin/*` routes require `Admin`.
 
 ---
 
@@ -201,6 +214,7 @@ Mapped to the brief's phases:
 | 2     | Core Implementation (Git, BE, FE, UTs)         | Epics 3, 4, 5, 6, 7                                                           |
 | 3     | CI/CD (Azure deployment skipped — N/A)         | Epic 8                                                                        |
 | 4     | AI re-implementation in a new repo             | Epic 9                                                                        |
+| —     | Admin role (post-PRD addition)                 | Epic 10                                                                       |
 
 See `epics.md` for the full epic and story breakdown.
 
@@ -209,11 +223,11 @@ See `epics.md` for the full epic and story breakdown.
 ## 11. Constraints & Assumptions
 
 - **C1**: The exercise is for a junior developer; complexity must stay approachable, not enterprise-grade.
-- **C2**: "Scripted users" = seeded into the database via SQL script; no admin UI.
-- **C3**: "Search by user" in History is interpreted as cross-user search by `username` filter, not per-user isolation.
+- **C2**: ~~"Scripted users" = seeded into the database via SQL script; no admin UI.~~ **Superseded 2026-07-29**: an Admin role now exists (Epic 10). "Scripted users" still applies to the two original demo accounts (`evi`, `nik`) and the seeded `admin` account (Story 10.1); beyond those, an Admin can create/delete accounts through the UI — there is still no public self-service sign-up.
+- **C3**: "Search by user" in History is interpreted as cross-user search by `username` filter for an **Admin**; a non-admin's search is always scoped to their own username regardless of the filter value (FR8 — tightened 2026-07-29 to close a data-leak risk in the original interpretation).
 - **C4**: Database is SQL Server, not PostgreSQL as the brief originally stated — team decision.
 - **C5**: This is **brownfield** — the existing frontend (see §1.1) is evolved, not rewritten. Migration steps must preserve current behaviour until the backend replacement is in place.
-- **C6**: **Plain layered architecture is the complexity ceiling.** Backend = Controller → Service → DbContext (EF Core) inside a **single project**, folder-separated (`Controllers/`, `Services/`, `Data/`, `Models/`). Frontend = `pages/` + `lib/` with props-down state. Explicitly **NOT** introduced: Clean Architecture, DDD aggregates, CQRS / MediatR, Repository pattern, `IEntityTypeConfiguration<T>` classes, DI extension methods, Redux / Zustand / form libraries, schema-validation libraries. This is an intern-led training exercise; revisit only if the brief expands.
+- **C6**: **Plain layered architecture is the complexity ceiling.** Backend = Controller → Service → DbContext (EF Core) inside a **single project**, folder-separated (`Controllers/`, `Services/`, `Data/`, `Models/`). Frontend = `pages/` + `lib/` with props-down state. Explicitly **NOT** introduced: Clean Architecture, DDD aggregates, CQRS / MediatR, Repository pattern, `IEntityTypeConfiguration<T>` classes, DI extension methods, Redux / Zustand / form libraries, schema-validation libraries. This is an intern-led training exercise; revisit only if the brief expands. The Admin role (Epic 10) follows the same ceiling — role is a plain string column, not a permissions table.
 - **C7**: **Solo intern descope.** This is a 1-developer exercise (Evi), not a team. Team-process scaffolding from the brief is implemented via the lightest mechanism that preserves the underlying intent:
   - **Gitflow (`develop`/`release`/`hotfix` branches, branch protection)** → one feature branch off `main` per story, PR, coach review, merge.
   - **KanBan board** → story files under `_bmad-output/implementation-artifacts/` + `sprint-status.yaml`.
@@ -245,12 +259,15 @@ See `epics.md` for the full epic and story breakdown.
 | Q2 | Pagination defaults for History (page size 20? 50?)                              | Coach | Story 6.1      |
 | Q3 | Confirm: search by user is across all users, not "self only"?                    | Coach | Story 6.1      |
 | Q4 | SonarLint only, or also a server-side SonarQube scan in CI?                      | Coach | Story 8.1      |
+| Q5 | Should an Admin be able to promote/demote another user's role, or only create/delete accounts? | Coach | Story 10.3 |
+| Q6 | Password policy for Admin-created accounts — same 4-char minimum as existing scripted users, or stricter? | Coach | Story 10.3 |
 
 ---
 
 ## 14. Glossary
 
 - **Scripted user** — A user seeded into the database via SQL script, not created through any in-app flow.
+- **Admin** — A user with `Role = "Admin"`, able to create/delete user accounts and view any/all users' calculation history through the UI. Added post-PRD (Epic 10); see §2 G7, §5 FR7-FR9.
 - **Expression** — A user-entered arithmetic string, e.g. `12 + 4 * (3 - 1)`.
 - **Calculation** — The persisted record of an expression and its evaluated result, attributed to a user with a timestamp.
 - **Gitflow** — A branching model with long-lived `main` + `develop`, plus short-lived `feature/*`, `release/*`, `hotfix/*` branches. *Descoped here per §11 C7; this PRD uses a single `main` + per-story feature branches.*
