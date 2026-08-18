@@ -4,10 +4,11 @@ namespace WebCalculator.Api.Data;
 
 public static class DataSeeder
 {
-    private static readonly (string Username, string Password)[] ScriptedUsers =
+    private static readonly (string Username, string Password, string Role)[] ScriptedUsers =
     {
-        ("evi", "1234"),
-        ("nik", "5678"),
+        ("evi", "1234", "User"),
+        ("nik", "5678", "User"),
+        ("admin", "admin123", "Admin"),
     };
 
     public static async Task<int> SeedAsync(AppDbContext db, ILogger logger, CancellationToken ct = default)
@@ -24,6 +25,7 @@ public static class DataSeeder
             {
                 Username = u.Username,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(u.Password),
+                Role = u.Role,
             });
         }
 

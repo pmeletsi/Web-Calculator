@@ -1,5 +1,4 @@
 -- WebCalculator schema (mirrors EF Core migration InitialCreate).
--- Generated 2026-06-10.
 
 IF OBJECT_ID('dbo.Calculations', 'U') IS NOT NULL DROP TABLE dbo.Calculations;
 IF OBJECT_ID('dbo.Users',        'U') IS NOT NULL DROP TABLE dbo.Users;
@@ -8,6 +7,7 @@ CREATE TABLE dbo.Users (
     Id           INT           IDENTITY(1,1) NOT NULL,
     Username     NVARCHAR(50)                NOT NULL,
     PasswordHash NVARCHAR(256)               NOT NULL,
+    Role         NVARCHAR(20)                NOT NULL DEFAULT 'User',
     CreatedAt    DATETIME2                   NOT NULL DEFAULT SYSUTCDATETIME(),
     CONSTRAINT PK_Users PRIMARY KEY CLUSTERED (Id)
 );
