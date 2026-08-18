@@ -19,9 +19,8 @@ public class CalculationsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CalculationRequest request, CancellationToken ct)
     {
-        var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
-            ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-            ?? User.Identity?.Name;
+        var userIdClaim = User.FindFirst("uid")?.Value
+            ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         var username = User.FindFirst(JwtRegisteredClaimNames.UniqueName)?.Value
             ?? User.FindFirst(ClaimTypes.Name)?.Value;
 
@@ -31,7 +30,6 @@ public class CalculationsController : ControllerBase
         }
 
         var (validation, result) = await _service.CalculateAsync(request.Expression, userId, username, ct);
-
         if (!validation.IsValid)
         {
             return BadRequest(new { reason = validation.Reason.ToString(), message = validation.Message });
