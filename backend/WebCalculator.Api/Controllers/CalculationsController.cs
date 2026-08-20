@@ -53,13 +53,22 @@ public class CalculationsController : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> List(
-        [FromQuery] string? username,
-        [FromQuery] int page = 1,
-        [FromQuery] int pageSize = 20,
-        CancellationToken ct = default)
+    [FromQuery] string? username,
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 20,
+    CancellationToken ct = default)
     {
         if (page < 1) page = 1;
         if (pageSize < 1 || pageSize > 100) pageSize = 20;
+
+        // Story 10.4 - Role-aware history access
+        var role = User.FindFirst(ClaimTypes.Role)?.Value;
+
+        if (role != "Admin")
+        {
+            username = User.FindFirst(JwtRegisteredClaimNames.UniqueName)?.Value
+                ?? User.FindFirst(ClaimTypes.Name)?.Value;
+        }
 
         var result = await _service.GetAsync(username, page, pageSize, ct);
         return Ok(result);
