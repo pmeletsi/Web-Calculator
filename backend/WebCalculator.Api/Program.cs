@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -16,9 +17,13 @@ builder.Services.AddDbContext<AppDbContext>(opts =>
 builder.Services.AddSingleton<ExpressionValidator>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<CalculationService>();
+builder.Services.AddScoped<AdminUserService>();
 
 // CORS
-var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+var allowedOrigins = builder.Configuration
+    .GetSection("Cors:AllowedOrigins")
+    .Get<string[]>() ?? Array.Empty<string>();
+
 builder.Services.AddCors(opts =>
 {
     opts.AddPolicy("Frontend", policy =>
@@ -30,6 +35,7 @@ builder.Services.AddCors(opts =>
 // JWT
 var jwtKey = builder.Configuration["Jwt:Key"]
     ?? throw new InvalidOperationException("Jwt:Key missing.");
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -39,21 +45,29 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
+
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+
+            IssuerSigningKey =
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+
             NameClaimType = JwtRegisteredClaimNames.Sub,
+            RoleClaimType = ClaimTypes.Role
         };
     });
+
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
 app.UseCors("Frontend");
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapGet("/healthz", () => Results.Ok(new { status = "healthy" }));
+
 app.MapControllers();
 
 using (var scope = app.Services.CreateScope())
