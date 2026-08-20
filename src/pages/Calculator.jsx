@@ -19,7 +19,7 @@ import ThemeToggleButton from '../components/ThemeToggleButton.jsx';
 
 
 const Calculator = () => {
-  const { logout } = useAuth();
+  const { logout, isAdmin } = useAuth();
   const [input, setInput] = useState('');
   const [result, setResult] = useState('0');
   const [submitting, setSubmitting] = useState(false);
@@ -142,6 +142,18 @@ const Calculator = () => {
           <Button color="inherit" component={Link} to="/history">
             History
           </Button>
+
+                  {isAdmin && (
+                      <>
+                          <Button color="inherit" component={Link} to="/admin/users">
+                              Admin Users
+                          </Button>
+
+                          <Button color="inherit" component={Link} to="/admin/history">
+                              Admin History
+                          </Button>
+                      </>
+                  )}
 
           <ThemeToggleButton />
 

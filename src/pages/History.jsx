@@ -9,7 +9,7 @@ import ThemeToggleButton from '../components/ThemeToggleButton.jsx';
 const fmtDate = (iso) => new Date(iso).toLocaleString();
 
 const History = () => {
-  const { logout } = useAuth();
+  const { logout, isAdmin } = useAuth();
   const [items, setItems] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
@@ -107,6 +107,17 @@ const History = () => {
           <Button color="inherit" component={Link} to="/">Calculator</Button>
           <ThemeToggleButton />
           <Button color="inherit" onClick={logout}>Logout</Button>
+                  {isAdmin && (
+                      <>
+                          <Button color="inherit" component={Link} to="/admin/users">
+                              Admin Users
+                          </Button>
+
+                          <Button color="inherit" component={Link} to="/admin/history">
+                              Admin History
+                          </Button>
+                      </>
+                  )}
         </Toolbar>
       </AppBar>
 
