@@ -3,6 +3,7 @@ import LoginPage from './pages/Login.jsx';
 import CalculatorPage from './pages/Calculator.jsx';
 import HistoryPage from './pages/History.jsx';
 import { useAuth } from './lib/AuthContext.jsx';
+import AdminUsers from './pages/AdminUsers.jsx';
 
 function RequireAuth({ children }) {
     const { user } = useAuth();
@@ -54,7 +55,7 @@ const App = () => (
             path="/admin/users"
             element={
                 <RequireAdmin>
-                    <div>Coming soon - Admin Users</div>
+                    <AdminUsers />
                 </RequireAdmin>
             }
         />
