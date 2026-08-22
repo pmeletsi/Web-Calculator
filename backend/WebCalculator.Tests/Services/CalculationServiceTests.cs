@@ -188,4 +188,49 @@ public class CalculationServiceTests
         Assert.AreEqual("10+0", result.Items[0].Expression);
         Assert.AreEqual("19+0", result.Items[9].Expression);
     }
+    [TestMethod]
+    public async Task Get_without_username_filter_returns_all_users()
+    {
+        var (service, db) = NewSut();
+
+        var evi = await SeedUserAsync(db, "evi");
+        var nik = await SeedUserAsync(db, "nik");
+
+        var now = DateTime.UtcNow;
+
+        db.Calculations.AddRange(
+            new Calculation
+            {
+                UserId = evi.Id,
+                Username = evi.Username,
+                Expression = "1+1",
+                Result = 2,
+                CreatedAt = now,
+            },
+            new Calculation
+            {
+                UserId = nik.Id,
+                Username = nik.Username,
+                Expression = "2+2",
+                Result = 4,
+                CreatedAt = now.AddSeconds(-1),
+            });
+
+        await db.SaveChangesAsync();
+
+        var result = await service.GetAsync(
+            username: null,
+            page: 1,
+            pageSize: 10,
+            CancellationToken.None);
+
+        Assert.AreEqual(2, result.Total);
+        Assert.AreEqual(2, result.Items.Count);
+
+        CollectionAssert.AreEquivalent(
+            new[] { "evi", "nik" },
+            result.Items
+                .Select(item => item.Username)
+                .ToArray());
+    }
 }
