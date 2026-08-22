@@ -2,8 +2,9 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/Login.jsx';
 import CalculatorPage from './pages/Calculator.jsx';
 import HistoryPage from './pages/History.jsx';
-import { useAuth } from './lib/AuthContext.jsx';
 import AdminUsers from './pages/AdminUsers.jsx';
+import AdminHistory from './pages/AdminHistory.jsx';
+import { useAuth } from './lib/AuthContext.jsx';
 
 function RequireAuth({ children }) {
     const { user } = useAuth();
@@ -64,12 +65,15 @@ const App = () => (
             path="/admin/history"
             element={
                 <RequireAdmin>
-                    <div>Coming soon - Admin History</div>
+                    <AdminHistory />
                 </RequireAdmin>
             }
         />
 
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route
+            path="*"
+            element={<Navigate to="/" replace />}
+        />
     </Routes>
 );
 
