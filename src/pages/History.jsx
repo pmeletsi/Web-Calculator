@@ -271,9 +271,8 @@ const History = () => {
                                 event.target.value
                             )
                         }
-                        inputProps={{
-                            step: 'any',
-                        }}
+                        sx={{ flexGrow: 1 }}
+               
                     />
 
                     <Button

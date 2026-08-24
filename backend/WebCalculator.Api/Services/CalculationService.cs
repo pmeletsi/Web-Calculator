@@ -29,8 +29,8 @@ public class CalculationService
         var (validation, previewResult) =
             Preview(expression);
 
-        if (!validation.IsValid
-            || previewResult is null)
+        if (!validation.IsValid ||
+            previewResult is null)
         {
             return (validation, null);
         }
@@ -91,9 +91,8 @@ public class CalculationService
                     "Division by Zero: Δεν επιτρέπεται η διαίρεση με το μηδέν."),
                 null);
         }
-        catch (Exception)
+        catch (Exception) // nosonar
         {
-
             return (
                 ValidationResult.Fail(
                     ValidationReason.BadCharacter,
@@ -104,7 +103,7 @@ public class CalculationService
 
     public async Task<PagedResult<CalculationResponse>> GetAsync(
         string? username,
-        decimal? resultFilter,
+        string? resultFilter,
         int page,
         int pageSize,
         CancellationToken ct)
@@ -126,19 +125,21 @@ public class CalculationService
 
         if (!string.IsNullOrWhiteSpace(resultFilter))
         {
+            var trimmedResultFilter =
+                resultFilter.Trim();
+
             query = query.Where(calculation =>
                 calculation.Result
                     .ToString()
-                    .Contains(resultFilter));
+                    .Contains(trimmedResultFilter));
         }
 
         var total =
             await query.CountAsync(ct);
 
         var items = await query
-            .OrderByDescending(
-                calculation =>
-                    calculation.CreatedAt)
+            .OrderByDescending(calculation =>
+                calculation.CreatedAt)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .Select(calculation =>
