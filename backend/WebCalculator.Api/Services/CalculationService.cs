@@ -93,9 +93,7 @@ public class CalculationService
         }
         catch (Exception)
         {
-            // Defence in depth:
-            // NCalc may throw for overflow or expression
-            // shapes missed by the validator.
+
             return (
                 ValidationResult.Fail(
                     ValidationReason.BadCharacter,
@@ -126,11 +124,12 @@ public class CalculationService
                     usernamePattern));
         }
 
-        if (resultFilter.HasValue)
+        if (!string.IsNullOrWhiteSpace(resultFilter))
         {
             query = query.Where(calculation =>
                 calculation.Result
-                == resultFilter.Value);
+                    .ToString()
+                    .Contains(resultFilter));
         }
 
         var total =

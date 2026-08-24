@@ -79,7 +79,7 @@ public class CalculationsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> List(
         [FromQuery] string? username,
-        [FromQuery(Name = "result")] decimal? resultFilter,
+        [FromQuery(Name = "result")] string? resultFilter,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20,
         CancellationToken ct = default)

@@ -264,7 +264,6 @@ const History = () => {
                 >
                     <TextField
                         label="Search by result"
-                        type="number"
                         size="small"
                         value={searchInput}
                         onChange={(event) =>
@@ -275,7 +274,6 @@ const History = () => {
                         inputProps={{
                             step: 'any',
                         }}
-                        sx={{ flexGrow: 1 }}
                     />
 
                     <Button
