@@ -256,16 +256,16 @@ const Calculator = () => {
           </Grid>
 
           <Grid size={3}>
-            <Button
-              fullWidth
-              size="large"
-              variant="contained"
-              color="primary"
-              disabled={!!getExpressionError(input) || submitting}
-              onClick={handleCalculate}
-            >
-              {submitting ? <CircularProgress size={20} color="inherit" /> : '='}
-            </Button>
+                      <Button
+                          fullWidth
+                          size="large"
+                          variant="contained"
+                          color="primary"
+                          disabled={submitting}
+                          onClick={handleCalculate}
+                      >
+                          {submitting ? <CircularProgress size={20} color="inherit" /> : '='}
+                      </Button>
           </Grid>
         </Grid>
 
