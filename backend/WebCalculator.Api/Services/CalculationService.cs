@@ -10,21 +10,34 @@ public class CalculationService
     private readonly AppDbContext _db;
     private readonly ExpressionValidator _validator;
 
-    public CalculationService(AppDbContext db, ExpressionValidator validator)
+    public CalculationService(
+        AppDbContext db,
+        ExpressionValidator validator)
     {
         _db = db;
         _validator = validator;
     }
 
-    public async Task<(ValidationResult validation, CalculationResponse? result)> CalculateAsync(
-        string expression, int userId, string username, CancellationToken ct)
+    public async Task<(
+        ValidationResult validation,
+        CalculationResponse? result)> CalculateAsync(
+        string expression,
+        int userId,
+        string username,
+        CancellationToken ct)
     {
-        var (validation, previewResult) = Preview(expression);
-        if (!validation.IsValid || previewResult is null) return (validation, null);
+        var (validation, previewResult) =
+            Preview(expression);
+
+        if (!validation.IsValid
+            || previewResult is null)
+        {
+            return (validation, null);
+        }
 
         var result = previewResult.Value;
 
-        var calc = new Calculation
+        var calculation = new Calculation
         {
             UserId = userId,
             Username = username,
@@ -32,68 +45,131 @@ public class CalculationService
             Result = result,
         };
 
-        _db.Calculations.Add(calc);
+        _db.Calculations.Add(calculation);
+
         await _db.SaveChangesAsync(ct);
 
-        return (validation, new CalculationResponse(calc.Id, calc.Expression, calc.Result, calc.CreatedAt, calc.Username));
+        var response = new CalculationResponse(
+            calculation.Id,
+            calculation.Expression,
+            calculation.Result,
+            calculation.CreatedAt,
+            calculation.Username);
+
+        return (validation, response);
     }
 
-    public (ValidationResult validation, decimal? result) Preview(string expression)
+    public (
+        ValidationResult validation,
+        decimal? result) Preview(
+        string expression)
     {
-        var validation = _validator.Validate(expression);
-        if (!validation.IsValid) return (validation, null);
+        var validation =
+            _validator.Validate(expression);
+
+        if (!validation.IsValid)
+        {
+            return (validation, null);
+        }
 
         try
         {
-            var ncalc = new Expression(expression, ExpressionOptions.DecimalAsDefault);
-            return (validation, Convert.ToDecimal(ncalc.Evaluate()));
+            var ncalc = new Expression(
+                expression,
+                ExpressionOptions.DecimalAsDefault);
+
+            var result =
+                Convert.ToDecimal(ncalc.Evaluate());
+
+            return (validation, result);
         }
         catch (DivideByZeroException)
         {
-            return (ValidationResult.Fail(
-                ValidationReason.DivisionByZero,
-                "Division by Zero: Δεν επιτρέπεται η διαίρεση με το μηδέν."), null);
+            return (
+                ValidationResult.Fail(
+                    ValidationReason.DivisionByZero,
+                    "Division by Zero: Δεν επιτρέπεται η διαίρεση με το μηδέν."),
+                null);
         }
-        catch (Exception) // nosonar — Defence in depth: NCalc may throw for overflow or expression shapes missed by validation; return a controlled client error instead of leaking a server error.
+        catch (Exception)
         {
-            return (ValidationResult.Fail(
-                ValidationReason.BadCharacter,
-                "Syntax Error: Η εξίσωση έχει λανθασμένη μορφή."), null);
+            // Defence in depth:
+            // NCalc may throw for overflow or expression
+            // shapes missed by the validator.
+            return (
+                ValidationResult.Fail(
+                    ValidationReason.BadCharacter,
+                    "Syntax Error: Η εξίσωση έχει λανθασμένη μορφή."),
+                null);
         }
     }
 
     public async Task<PagedResult<CalculationResponse>> GetAsync(
-        string? username, int page, int pageSize, CancellationToken ct)
+        string? username,
+        decimal? resultFilter,
+        int page,
+        int pageSize,
+        CancellationToken ct)
     {
-        var query = _db.Calculations.AsNoTracking().AsQueryable();
+        var query = _db.Calculations
+            .AsNoTracking()
+            .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(username))
         {
-            var term = $"%{username}%";
-            query = query.Where(c => EF.Functions.Like(c.Username, term));
+            var usernamePattern =
+                $"%{username.Trim()}%";
+
+            query = query.Where(calculation =>
+                EF.Functions.Like(
+                    calculation.Username,
+                    usernamePattern));
         }
 
-        var total = await query.CountAsync(ct);
+        if (resultFilter.HasValue)
+        {
+            query = query.Where(calculation =>
+                calculation.Result
+                == resultFilter.Value);
+        }
+
+        var total =
+            await query.CountAsync(ct);
 
         var items = await query
-            .OrderByDescending(c => c.CreatedAt)
+            .OrderByDescending(
+                calculation =>
+                    calculation.CreatedAt)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .Select(c => new CalculationResponse(c.Id, c.Expression, c.Result, c.CreatedAt, c.Username))
+            .Select(calculation =>
+                new CalculationResponse(
+                    calculation.Id,
+                    calculation.Expression,
+                    calculation.Result,
+                    calculation.CreatedAt,
+                    calculation.Username))
             .ToListAsync(ct);
 
-        return new PagedResult<CalculationResponse>(items, total);
+        return new PagedResult<CalculationResponse>(
+            items,
+            total);
     }
 
-    public Task<int> DeleteAllAsync(CancellationToken ct)
+    public Task<int> DeleteAllAsync(
+        CancellationToken ct)
     {
-        return _db.Calculations.ExecuteDeleteAsync(ct);
+        return _db.Calculations
+            .ExecuteDeleteAsync(ct);
     }
 
-    public async Task<bool> DeleteAsync(int id, CancellationToken ct)
+    public async Task<bool> DeleteAsync(
+        int id,
+        CancellationToken ct)
     {
         var deleted = await _db.Calculations
-            .Where(c => c.Id == id)
+            .Where(calculation =>
+                calculation.Id == id)
             .ExecuteDeleteAsync(ct);
 
         return deleted > 0;

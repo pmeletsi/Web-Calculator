@@ -14,38 +14,63 @@ public class CalculationsController : ControllerBase
 {
     private readonly CalculationService _service;
 
-    public CalculationsController(CalculationService service) { _service = service; }
+    public CalculationsController(CalculationService service)
+    {
+        _service = service;
+    }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CalculationRequest request, CancellationToken ct)
+    public async Task<IActionResult> Create(
+        [FromBody] CalculationRequest request,
+        CancellationToken ct)
     {
-        var userIdClaim = User.FindFirst("uid")?.Value
+        var userIdClaim =
+            User.FindFirst("uid")?.Value
             ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        var username = User.FindFirst(JwtRegisteredClaimNames.UniqueName)?.Value
+
+        var username =
+            User.FindFirst(JwtRegisteredClaimNames.UniqueName)?.Value
             ?? User.FindFirst(ClaimTypes.Name)?.Value;
 
-        if (!int.TryParse(userIdClaim, out var userId) || string.IsNullOrWhiteSpace(username))
+        if (!int.TryParse(userIdClaim, out var userId)
+            || string.IsNullOrWhiteSpace(username))
         {
             return Unauthorized();
         }
 
-        var (validation, result) = await _service.CalculateAsync(request.Expression, userId, username, ct);
+        var (validation, result) =
+            await _service.CalculateAsync(
+                request.Expression,
+                userId,
+                username,
+                ct);
+
         if (!validation.IsValid)
         {
-            return BadRequest(new { reason = validation.Reason.ToString(), message = validation.Message });
+            return BadRequest(new
+            {
+                reason = validation.Reason.ToString(),
+                message = validation.Message
+            });
         }
 
         return Ok(result);
     }
 
     [HttpPost("preview")]
-    public IActionResult Preview([FromBody] CalculationRequest request)
+    public IActionResult Preview(
+        [FromBody] CalculationRequest request)
     {
-        var (validation, result) = _service.Preview(request.Expression);
+        var (validation, result) =
+            _service.Preview(request.Expression);
 
         if (!validation.IsValid)
         {
-            return BadRequest(new { reason = validation.Reason.ToString(), message = validation.Message });
+            return BadRequest(new
+            {
+                reason = validation.Reason.ToString(),
+                message = validation.Message
+            });
         }
 
         return Ok(new { result });
@@ -53,38 +78,58 @@ public class CalculationsController : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> List(
-    [FromQuery] string? username,
-    [FromQuery] int page = 1,
-    [FromQuery] int pageSize = 20,
-    CancellationToken ct = default)
+        [FromQuery] string? username,
+        [FromQuery(Name = "result")] decimal? resultFilter,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        CancellationToken ct = default)
     {
-        if (page < 1) page = 1;
-        if (pageSize < 1 || pageSize > 100) pageSize = 20;
+        if (page < 1)
+        {
+            page = 1;
+        }
 
-        // Story 10.4 - Role-aware history access
+        if (pageSize < 1 || pageSize > 100)
+        {
+            pageSize = 20;
+        }
+
         var role = User.FindFirst(ClaimTypes.Role)?.Value;
 
         if (role != "Admin")
         {
-            username = User.FindFirst(JwtRegisteredClaimNames.UniqueName)?.Value
+            username =
+                User.FindFirst(JwtRegisteredClaimNames.UniqueName)?.Value
                 ?? User.FindFirst(ClaimTypes.Name)?.Value;
         }
 
-        var result = await _service.GetAsync(username, page, pageSize, ct);
-        return Ok(result);
+        var response = await _service.GetAsync(
+            username,
+            resultFilter,
+            page,
+            pageSize,
+            ct);
+
+        return Ok(response);
     }
 
     [HttpDelete]
-    public async Task<IActionResult> Clear(CancellationToken ct)
+    public async Task<IActionResult> Clear(
+        CancellationToken ct)
     {
-        var deleted = await _service.DeleteAllAsync(ct);
+        var deleted =
+            await _service.DeleteAllAsync(ct);
+
         return Ok(new { deleted });
     }
 
     [HttpDelete("{id:int}")]
-    public async Task<IActionResult> Delete(int id, CancellationToken ct)
+    public async Task<IActionResult> Delete(
+        int id,
+        CancellationToken ct)
     {
         await _service.DeleteAsync(id, ct);
+
         return NoContent();
     }
 }
