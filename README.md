@@ -120,3 +120,34 @@ Status file:
 
 Pick the next task from:  
 `_bmad-output/planning-artifacts/epics.md`
+
+
+## Screenshots from the web calculator
+## USER
+
+<img width="1280" height="710" alt="Screenshot_2026-08-26_121249" src="https://github.com/user-attachments/assets/b15ed73b-a51a-4417-a394-a6762d991b13" />
+<img width="1536" height="677" alt="Screenshot_2026-08-26_121311" src="https://github.com/user-attachments/assets/a09bf06a-c77e-483b-9963-c02c04ec0dbe" />
+<img width="1280" height="667" alt="Screenshot_2026-08-26_121528" src="https://github.com/user-attachments/assets/67790dc0-2605-4bb7-8e51-f46b76d254b6" />
+<img width="1280" height="578" alt="Screenshot_2026-08-26_121516" src="https://github.com/user-attachments/assets/2f7023b8-9b48-4bb4-8235-d3dbe8dec0da" />
+<img width="1536" height="681" alt="Screenshot_2026-08-26_121445" src="https://github.com/user-attachments/assets/d27839ba-0dca-47f9-b729-0b65965c5b3b" />
+
+## ADMIN
+
+<img width="1280" height="586" alt="Screenshot_2026-08-22_094154" src="https://github.com/user-attachments/assets/e4116031-ba4d-4e65-8694-1a003f92f96d" />
+<img width="1536" height="582" alt="Screenshot_2026-08-22_131311" src="https://github.com/user-attachments/assets/5d63601f-13d7-4177-88dc-cb7f59073543" />
+<img width="1536" height="659" alt="Screenshot_2026-08-22_153054" src="https://github.com/user-attachments/assets/eb01e284-a6b2-4bf5-9f96-bc8800f3bf42" />
+<img width="1536" height="681" alt="Screenshot_2026-08-26_121445" src="https://github.com/user-attachments/assets/9e0b2f92-dcf5-48a5-9aa2-531efe617fc4" />
+<img width="1536" height="684" alt="Screenshot_2026-08-26_121557" src="https://github.com/user-attachments/assets/c87d9caa-a6c7-48a0-af6d-89aadc1c617f" />
+
+## SonarQube
+<img width="1284" height="548" alt="Screenshot_2026-07-28_143228" src="https://github.com/user-attachments/assets/7255e9c2-9d40-4df6-9e62-12095f3de479" />
+<img width="1373" height="551" alt="Screenshot_2026-07-28_144140" src="https://github.com/user-attachments/assets/aec5ef34-1292-4cd8-abdd-9554bd435584" />
+
+
+
+
+
+
+
+
+
